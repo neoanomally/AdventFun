@@ -10,3 +10,5 @@ libraryDependencies ++= Seq(
 )
 
 testFrameworks += new TestFramework("munit.Framework")
+
+cancelable in Global := true

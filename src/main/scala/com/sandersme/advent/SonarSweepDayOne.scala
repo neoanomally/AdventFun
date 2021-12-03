@@ -22,28 +22,72 @@ package com.sandersme.advent
 
 object SonarSweepDayOne {
 
-  case class Accumulator(prevVal: Option[Int], sumOfIncreases: Int)
+  trait BaseAccumulator {
+    def update(depth: Int): BaseAccumulator
+    val increments: Int
+  }
+
+  case class Accumulator(prevVal: Option[Int], increments: Int) extends BaseAccumulator {
+    def update(depth: Int): Accumulator = {
+      // TODO: Might be nice to clean this up, but these are the three cases. Could use maps
+      if (prevVal.isEmpty) {
+        copy(prevVal = Some(depth))
+      } else if (depth > prevVal.get) {
+        copy(prevVal = Some(depth), increments = increments + 1)
+      } else {
+        copy(prevVal = Some(depth))
+      }
+    }
+  }
+
+  case class SlidingWindowAccumulator(queue: LimitQueue[Int],
+                                      increments: Int) extends BaseAccumulator {
+
+    def update(nextVal: Int): SlidingWindowAccumulator = {
+      val wasAtLimit = queue.isAtLimit
+      val previousSum = queue.sum
+      val updatedQueue = queue.enqueue(nextVal)
+      val currentSum = updatedQueue.sum
+
+      val hasIncreased = currentSum > previousSum
+
+      if (wasAtLimit && hasIncreased) {
+        copy(queue = updatedQueue, increments = increments + 1)
+      } else {
+        copy(queue = updatedQueue, increments = increments)
+      }
+    }
+  }
+
   val defaultAccumulator = Accumulator(None, 0)
+  val defaultSlidingWindowAccumulator = SlidingWindowAccumulator(LimitQueue(3), 0)
 
   def main(args: Array[String]): Unit = {
     val lines = Input.readFromDataResource("day1_input")
 
     val depths = lines.map(_.toInt)
 
-    println(calculateNumberOfIncreases(depths))
+    // NOTE: This is just for sanity check. I realize I could do a sliding window
+    // Using the sliding method on the list, but that doesn't let me play with
+    // Functional FoldLeft ;) 
+    val slidingWindow = calculateIncreases(
+      depths.sliding(3)
+        .map(_.sum)
+        .toList, defaultAccumulator
+    )
+
+
+    val previousSoundings = calculateIncreases(depths, defaultAccumulator)
+    val slidingWindowSoundings = calculateIncreases(depths, defaultSlidingWindowAccumulator)
+    println(s"Reading previous value only $previousSoundings")
+    println(s"Readings based on sliding window $slidingWindowSoundings")
+    println(s"Sliding windows $slidingWindow")
   }
 
-  def calculateNumberOfIncreases(depths: List[Int]): Accumulator = {
+  def calculateIncreases(depths: List[Int], defaultAccum: BaseAccumulator): BaseAccumulator = {
     depths
-      .foldLeft(defaultAccumulator) { (accum, depth) =>
-        // TODO: Might be nice to clean this up, but these are the three cases. Could use maps
-        if (accum.prevVal.isEmpty) {
-          accum.copy(prevVal = Some(depth))
-        } else if (depth > accum.prevVal.get) {
-          accum.copy(prevVal = Some(depth), sumOfIncreases = accum.sumOfIncreases + 1)
-        } else {
-          accum.copy(prevVal = Some(depth))
-        }
+      .foldLeft(defaultAccum) {
+        (accum, depth) => accum.update(depth)
       }
   }
 }
