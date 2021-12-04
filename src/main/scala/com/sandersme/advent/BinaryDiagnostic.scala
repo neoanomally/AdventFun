@@ -23,7 +23,34 @@ object BinaryDiagnostic {
     }
   }
 
-  case class BitTypeCounters(counters: List[BitTypeCounter])
+  case class BitTypeCounters(counters: List[BitTypeCounter]) {
+    def gammaRate: BinaryCoding = {
+      val bits = counters.map { bitTypeCounter =>
+        if (bitTypeCounter.oneCount >= bitTypeCounter.zeroCount) {
+          One
+        } else {
+          Zero
+        }
+      }
+
+      BinaryCoding(bits)
+    }
+
+    def epsilonRate: BinaryCoding = {
+      val bits = gammaRate.bits.map{ bit =>
+        bit match {
+          case One => Zero
+          case Zero => One
+        }
+      }
+
+      BinaryCoding(bits)
+    }
+
+    def powerConsumption: Int = {
+      epsilonRate *= gammaRate
+    }
+  }
   case class BitTypeCounter(zeroCount: Int, oneCount: Int) {
     def += (thatBitCounter: BitTypeCounter): BitTypeCounter = {
       val zeroes = zeroCount + thatBitCounter.zeroCount
@@ -93,34 +120,6 @@ object BinaryDiagnostic {
      *
      * // TODO FIGURE OUT WHAT TO DO WHEN THEY ARE EQUAL. FOR NOW WE'll have them members of Both
      */
-    extension(binaryTypeCounters: BitTypeCounters) {
-      def gammaRate: BinaryCoding = {
-        val bits = binaryTypeCounters.counters.map { bitTypeCounter =>
-          if (bitTypeCounter.oneCount >= bitTypeCounter.zeroCount) {
-            One
-          } else {
-            Zero
-          }
-        }
-
-        BinaryCoding(bits)
-      }
-
-      def epsilonRate: BinaryCoding = {
-        val bits = binaryTypeCounters.gammaRate.bits.map{ bit =>
-          bit match {
-            case One => Zero
-            case Zero => One
-          }
-        }
-
-        BinaryCoding(bits)
-      }
-
-      def powerConsumption: Int = {
-        binaryTypeCounters.epsilonRate *= binaryTypeCounters.gammaRate
-      }
-    }
   }
 
   /**
