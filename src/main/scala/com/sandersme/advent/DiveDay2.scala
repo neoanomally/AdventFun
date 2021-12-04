@@ -1,8 +1,11 @@
 package com.sandersme.advent
 
+import com.sandersme.advent.Input.{parseDay2Input, readFromDataResource, readFromResource}
+import com.sandersme.advent.model.{Direction, Position, PilotCommand}
+
 /**
  * Now, you need to figure out how to pilot this thing.
-
+ *
  * It seems like the submarine can take a series of commands like forward 1, down 2, or up 3:
  *
  * forward X increases the horizontal position by X units.
@@ -36,5 +39,60 @@ package com.sandersme.advent
  */
 
 object DiveDay2 {
+  val DAY_2_INPUT = "day2_input"
 
+  def main(args: Array[String]): Unit = {
+    val dayTwoInput: List[String] = readFromDataResource(DAY_2_INPUT)
+
+    val parsedInput = dayTwoInput.map(Input.parseDay2Input)
+    val partTwoPosition = Position.calculatePosition(parsedInput)
+
+    val position = calculateFinalPosition(dayTwoInput)
+
+    println(s"Final position: $position with a multiple of: ${position.multiplyPosition}")
+    println(s"Final position for part two: $partTwoPosition with multiple" +
+      s"of ${partTwoPosition.multiplyPosition}")
+  }
+
+  /**
+   * Below are the first portions of the day 2 dive. I did not update these during the refactor
+   * since the part two is the final piece. These were left here for posterity.
+   */
+  def calculateFinalPosition(input: List[String]): Position = {
+    val pilotCommands = input.map(parseDay2Input)
+    val sumPilotCommands = sumPilotCommand(pilotCommands)
+    calculatePosition(sumPilotCommands)
+  }
+
+  def sumPilotCommand(pilotCommands: List[PilotCommand]): Map[Direction, Int] = {
+    pilotCommands
+      .groupBy(_.direction)
+      .map{ case (direction, values) =>
+        direction -> values.map(_.units).sum
+      }.toMap
+  }
+
+  def calculatePosition(pilotCommands: Map[Direction, Int]): Position = {
+    import Direction._
+
+    val positions: List[Position] = pilotCommands.map{ case (direction, sum) =>
+      direction match {
+        case Forward => Position(sum, 0, 0)
+        case Down => Position(0, sum, 0)
+        case Up => Position(0, -sum, 0)
+      }
+    }.toList
+
+    sumPositions(positions)
+  }
+
+  def sumPositions(positions: List[Position]): Position = {
+    positions.foldLeft(Position.EMPTY_POSITION) {
+      (left, right) =>
+        val depth = left.depth + right.depth
+        val horizontal = left.horizontal + right.horizontal
+        val aim = left.aim + right.aim
+        Position(horizontal, depth, aim)
+    }
+  }
 }

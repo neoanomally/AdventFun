@@ -1,7 +1,6 @@
-package com.sandersme.advent
+package com.sandersme.advent.model
 
-
-
+import com.sandersme.advent.LimitQueue
 
 trait Accumulator {
   def update(depth: Int): Accumulator

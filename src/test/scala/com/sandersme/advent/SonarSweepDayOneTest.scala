@@ -3,7 +3,7 @@ package com.sandersme.advent
 import junit.framework.TestCase.assertTrue
 import munit.Assertions.*
 import SonarSweepDayOne.*
-import com.sandersme.advent.Accumulator.calculateIncreases
+import com.sandersme.advent.model.Accumulator.calculateIncreases
 
 class SonarSweepDayOneTest extends munit.FunSuite  {
   test("Calculate empty list should have 0") {

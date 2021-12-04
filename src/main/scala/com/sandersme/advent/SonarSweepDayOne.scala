@@ -1,6 +1,7 @@
 package com.sandersme.advent
 
-import com.sandersme.advent.Accumulator.calculateIncreases
+import com.sandersme.advent.model.Accumulator.calculateIncreases
+import com.sandersme.advent.model.{SingleAccumulator, SlidingWindowAccumulator}
 
 /**
  * As the submarine drops below the surface of the ocean, it automatically performs
@@ -26,8 +27,10 @@ object SonarSweepDayOne {
   val defaultAccumulator = SingleAccumulator(None, 0)
   val defaultSlidingWindowAccumulator = SlidingWindowAccumulator(LimitQueue(3), 0)
 
+  val DAY_1_INPUT = "day1_input"
+
   def main(args: Array[String]): Unit = {
-    val lines = Input.readFromDataResource("day1_input")
+    val lines = Input.readFromDataResource(DAY_1_INPUT)
 
     val depths = lines.map(_.toInt)
 
