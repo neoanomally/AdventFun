@@ -2,10 +2,10 @@ package com.sandersme.advent
 
 import junit.framework.TestCase.assertTrue
 import munit.Assertions.*
-import SonarSweepDayOne.*
+import SonarSweep.*
 import com.sandersme.advent.model.Accumulator.calculateIncreases
 
-class SonarSweepDayOneTest extends munit.FunSuite  {
+class SonarSweepTest extends munit.FunSuite  {
   test("Calculate empty list should have 0") {
     val shouldEqualZero = calculateIncreases(List.empty, defaultAccumulator)
 

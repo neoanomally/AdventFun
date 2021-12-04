@@ -38,7 +38,7 @@ import com.sandersme.advent.model.{Direction, Position, PilotCommand}
  *  What do you get if you multiply your final horizontal position by your final depth?
  */
 
-object DiveDay2 {
+object Dive {
   val DAY_2_INPUT = "day2_input"
 
   def main(args: Array[String]): Unit = {

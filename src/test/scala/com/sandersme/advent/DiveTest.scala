@@ -1,11 +1,11 @@
 package com.sandersme.advent
 
 
-import com.sandersme.advent.DiveDay2.calculatePosition
+import com.sandersme.advent.Dive.calculatePosition
 import com.sandersme.advent.model.{Direction, PilotCommand, Position}
 import com.sandersme.advent.Input
 
-class DiveDay2Test extends munit.FunSuite {
+class DiveTest extends munit.FunSuite {
   val DAY_TWO_TEST_INPUT = List(
     "forward 5",
     "down 5",
@@ -24,7 +24,7 @@ class DiveDay2Test extends munit.FunSuite {
   test("Test end to end position") {
     val expectedFinalPosition = Position(15, 10, 0)
 
-    val position = DiveDay2.calculateFinalPosition(DAY_TWO_TEST_INPUT)
+    val position = Dive.calculateFinalPosition(DAY_TWO_TEST_INPUT)
 
     assertEquals(position, expectedFinalPosition)
   }
@@ -37,7 +37,7 @@ class DiveDay2Test extends munit.FunSuite {
     )
 
     val expectedPosition = Position(15, -15, 0)
-    val summedPosition = DiveDay2.sumPositions(testPositions)
+    val summedPosition = Dive.sumPositions(testPositions)
 
     assertEquals(expectedPosition, summedPosition)
   }

@@ -23,7 +23,7 @@ import com.sandersme.advent.model.{SingleAccumulator, SlidingWindowAccumulator}
  *
  */
 
-object SonarSweepDayOne {
+object SonarSweep {
   val defaultAccumulator = SingleAccumulator(None, 0)
   val defaultSlidingWindowAccumulator = SlidingWindowAccumulator(LimitQueue(3), 0)
 
