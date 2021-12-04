@@ -23,6 +23,15 @@ object BinaryDiagnostic {
     }
   }
 
+  /**
+   * Each bit in the gamma rate can be determined by finding the most common bit in the corresponding
+   * position of all numbers in the diagnostic report.
+   * Each bit in the episolon rate can be determined by finding the least common bit in the corresponding
+   * position of all numbers in the diagnostic report.
+   *
+   * // TODO FIGURE OUT WHAT TO DO WHEN THEY ARE EQUAL. FOR NOW WE'll have them members of Both
+   * // TODO: Move these things into their own files
+   */
   case class BitTypeCounters(counters: List[BitTypeCounter]) {
     def gammaRate: BinaryCoding = {
       val bits = counters.map { bitTypeCounter =>
@@ -111,15 +120,6 @@ object BinaryDiagnostic {
 
           BitTypeCounters(counters)
         }
-
-    /**
-     * Each bit in the gamma rate can be determined by finding the most common bit in the corresponding
-     * position of all numbers in the diagnostic report.
-     * Each bit in the episolon rate can be determined by finding the least common bit in the corresponding
-     * position of all numbers in the diagnostic report.
-     *
-     * // TODO FIGURE OUT WHAT TO DO WHEN THEY ARE EQUAL. FOR NOW WE'll have them members of Both
-     */
   }
 
   /**
