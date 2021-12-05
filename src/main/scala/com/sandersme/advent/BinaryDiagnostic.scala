@@ -1,126 +1,10 @@
 package com.sandersme.advent
 
+import com.sandersme.advent.model.BinaryCoding
+import com.sandersme.advent.model.BinaryCoding._
+
 object BinaryDiagnostic {
 
-  sealed trait Bit
-  object One extends Bit
-  object Zero extends Bit
-
-  case class OxygenGenerator(rating: Int)
-  case class C02Scrubber(rating: Int)
-
-
-  case class BinaryCoding(bits: List[Bit]) {
-    override def toString: String = {
-      bits.map(bit => bit match {
-        case Zero => "0"
-        case One => "1"
-      }).reduce(_ + _)
-    }
-
-    def toInt: Int = {
-      Integer.parseInt(toString, 2)
-    }
-  }
-
-  /**
-   * Each bit in the gamma rate can be determined by finding the most common bit in the corresponding
-   * position of all numbers in the diagnostic report.
-   * Each bit in the episolon rate can be determined by finding the least common bit in the corresponding
-   * position of all numbers in the diagnostic report.
-   *
-   * // TODO FIGURE OUT WHAT TO DO WHEN THEY ARE EQUAL. FOR NOW WE'll have them members of Both
-   * // TODO: Move these things into their own files
-   */
-  case class BitTypeCounters(counters: List[BitTypeCounter]) {
-    def gammaRate: BinaryCoding = {
-      val bits = counters.map { bitTypeCounter =>
-        if (bitTypeCounter.oneCount >= bitTypeCounter.zeroCount) {
-          One
-        } else {
-          Zero
-        }
-      }
-
-      BinaryCoding(bits)
-    }
-
-    def epsilonRate: BinaryCoding = {
-      val bits = gammaRate.bits.map{ bit =>
-        bit match {
-          case One => Zero
-          case Zero => One
-        }
-      }
-
-      BinaryCoding(bits)
-    }
-
-    def powerConsumption: Int = {
-      epsilonRate *= gammaRate
-    }
-  }
-  case class BitTypeCounter(zeroCount: Int, oneCount: Int) {
-    def += (thatBitCounter: BitTypeCounter): BitTypeCounter = {
-      val zeroes = zeroCount + thatBitCounter.zeroCount
-      val ones = oneCount + thatBitCounter.oneCount
-
-      BitTypeCounter(zeroes, ones)
-    }
-  }
-
-  object BitTypeCounter {
-    val DEFAULT_BIT_COUNTER = BitTypeCounter(0, 0)
-  }
-
-  object BinaryCoding {
-    def apply(input: String): BinaryCoding = {
-      val bits = input.toList
-        .map(value => if(value == '1') One else Zero)
-
-      BinaryCoding(bits)
-    }
-
-    extension (bitCoding: BinaryCoding) {
-      def toBitCounters: BitTypeCounters = {
-        val counters: List[BitTypeCounter] = bitCoding
-          .bits
-          .map(bit => bit match {
-            case Zero => BitTypeCounter(1, 0)
-            case One => BitTypeCounter(0, 1)
-          })
-
-        BitTypeCounters(counters)
-      }
-
-      def *=(other: BinaryCoding): Int = {
-        bitCoding.toInt * other.toInt
-      }
-    }
-
-    /**
-     * Map the bitCodings into BitCounters
-     * Combine two rows of BitCounters
-     * Then add each of the columns together.
-     *
-     * TODO Instead of returning a List of BitTypeCounter we should have a container
-     * class to indicate that the int are variable fields.
-     */
-    extension (binaryCodingList: List[BinaryCoding])
-      def sumBinaryCodingColumns: BitTypeCounters = {
-          val counters = binaryCodingList
-            .map(_.toBitCounters.counters)
-            .reduce{ case (leftCounterList, rightCounterList) =>
-              val zippedCounterList = leftCounterList zip rightCounterList
-              zippedCounterList
-                .map{ case(leftBitCounter, rightBitCounter) =>
-                  leftBitCounter += rightBitCounter
-                }
-            }
-
-          BitTypeCounters(counters)
-        }
-  }
 
   /**
    * The submarine has been making some odd creaking noises, so you ask it to produce a diagnostic report
@@ -163,7 +47,6 @@ To find oxygen generator rating, determine the most common value (0 or 1) in the
 To find CO2 scrubber rating, determine the least common value (0 or 1) in the current bit position, and keep only numbers with that bit in that position. If 0 and 1 are equally common, keep values with a 0 in the position being considered.
    */
   def main(args: Array[String]): Unit = {
-    import BinaryCoding._
 
     val binaryInput = Input.readFromDataResource("day3_input")
 

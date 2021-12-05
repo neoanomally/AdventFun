@@ -1,7 +1,7 @@
 package com.sandersme.advent
 
-import com.sandersme.advent.BinaryDiagnostic.*
-import com.sandersme.advent.BinaryDiagnostic.BinaryCoding.*
+import com.sandersme.advent.model.{ BitTypeCounters, BinaryCoding, BitTypeCounter }
+import com.sandersme.advent.model.BinaryCoding._
 
 class BinaryDiagnosticTest extends munit.FunSuite {
   val TEST_INPUT = List(
@@ -22,7 +22,7 @@ class BinaryDiagnosticTest extends munit.FunSuite {
   val t = Integer.parseInt("1001", 2)
 
   test("BinaryDiagnostic Parsing that we can parse our binary values into a list of Bits") {
-    val parsedValue = BinaryDiagnostic.BinaryCoding("00100").bits
+    val parsedValue = BinaryCoding("00100").bits
     val expected = List(Zero, Zero, One, Zero, Zero)
 
     assertEquals(parsedValue, expected)
@@ -39,7 +39,6 @@ class BinaryDiagnosticTest extends munit.FunSuite {
   }
 
   test("[Test the sum of two BitCounterLists") {
-    import com.sandersme.advent.BinaryDiagnostic.BinaryCoding._
 
     val inputTest: List[BinaryCoding] = List(
       BinaryCoding(List(Zero, One, One, Zero, One)),
