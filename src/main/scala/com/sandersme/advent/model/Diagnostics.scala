@@ -60,9 +60,14 @@ object Diagnostics {
    * Combine two rows of BitCounters
    * Then add each of the columns together.
    *
-   * TODO Instead of returning a List of BitTypeCounter we should have a container
+   * TODO: We should have a way to parse input: String and input: List[String]
+   * to create diagnostics from
    * class to indicate that the int are variable fields.
    */
+  def fromBinaryInput(binaryInput: List[String]): Diagnostics = binaryInput
+    .map(BinaryCoding.apply)
+    .toDiagnostics
+
   extension (binaryCodingList: List[BinaryCoding]) {
     def toDiagnostics: Diagnostics = Diagnostics(binaryCodingList)
   }

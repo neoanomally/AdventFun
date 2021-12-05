@@ -6,8 +6,6 @@ import com.sandersme.advent.model.Diagnostics
 import com.sandersme.advent.model.Diagnostics._
 
 object BinaryDiagnostic {
-
-
   /**
    * The submarine has been making some odd creaking noises, so you ask it to produce a diagnostic report
    * just in case.
@@ -52,15 +50,13 @@ To find CO2 scrubber rating, determine the least common value (0 or 1) in the cu
 
     val binaryInput = Input.readFromDataResource("day3_input")
 
-    val bitTypeCounters: Diagnostics = binaryInput
-      .map(BinaryCoding.apply)
-      .toDiagnostics
+    val diagnostics: Diagnostics = Diagnostics.fromBinaryInput(binaryInput)
 
-    val gammRate = bitTypeCounters.gammaRate
-    val epsilonRate = bitTypeCounters.epsilonRate
-    val powerConsumption = bitTypeCounters.powerConsumption
+    val gammRate = diagnostics.gammaRate
+    val epsilonRate = diagnostics.epsilonRate
+    val powerConsumption = diagnostics.powerConsumption
 
-    println(s"Here is our bit counters $bitTypeCounters")
+    println(s"Here is our bit counters $diagnostics")
     println(s"Power consumption $powerConsumption")
   }
 }

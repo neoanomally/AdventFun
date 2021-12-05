@@ -94,6 +94,9 @@ class BinaryDiagnosticTest extends munit.FunSuite {
     assertEquals(epsilonRate, expected)
   }
 
+  /**
+   * TODO MOVE Diagnostics Specific tests to it's own test file
+   */
   test("End to end test with test input case for power consumption") {
     val diagnostics = TEST_INPUT
       .map(BinaryCoding.apply)
