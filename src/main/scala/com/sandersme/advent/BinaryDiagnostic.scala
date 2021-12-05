@@ -2,6 +2,8 @@ package com.sandersme.advent
 
 import com.sandersme.advent.model.BinaryCoding
 import com.sandersme.advent.model.BinaryCoding._
+import com.sandersme.advent.model.Diagnostics
+import com.sandersme.advent.model.Diagnostics._
 
 object BinaryDiagnostic {
 
@@ -50,9 +52,9 @@ To find CO2 scrubber rating, determine the least common value (0 or 1) in the cu
 
     val binaryInput = Input.readFromDataResource("day3_input")
 
-    val bitTypeCounters = binaryInput
+    val bitTypeCounters: Diagnostics = binaryInput
       .map(BinaryCoding.apply)
-      .sumBinaryCodingColumns
+      .toDiagnostics
 
     val gammRate = bitTypeCounters.gammaRate
     val epsilonRate = bitTypeCounters.epsilonRate

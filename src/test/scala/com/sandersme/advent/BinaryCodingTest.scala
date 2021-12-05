@@ -1,7 +1,8 @@
 package com.sandersme.advent
 
-import com.sandersme.advent.model.{ BitTypeCounters, BinaryCoding, BitTypeCounter }
+import com.sandersme.advent.model.{ BinaryCoding, BitTypeCounter }
 import com.sandersme.advent.model.BinaryCoding._
+import com.sandersme.advent.model.Diagnostics._
 
 class BinaryDiagnosticTest extends munit.FunSuite {
   val TEST_INPUT = List(
@@ -46,12 +47,12 @@ class BinaryDiagnosticTest extends munit.FunSuite {
       BinaryCoding(List(One, Zero, Zero, One, Zero))
     )
 
-    val expectedResult: BitTypeCounters = BitTypeCounters( List(
+    val expectedResult: List[BitTypeCounter] = List(
       BitTypeCounter(2, 1), BitTypeCounter(2, 1), BitTypeCounter(1, 2),
       BitTypeCounter(2, 1), BitTypeCounter(1, 2)
-    ))
+    )
 
-    val summedValues = inputTest.sumBinaryCodingColumns
+    val summedValues = inputTest.toDiagnostics.totalBitCounters
     assertEquals(summedValues, expectedResult)
   }
 
@@ -72,44 +73,35 @@ class BinaryDiagnosticTest extends munit.FunSuite {
   }
 
   test("Gamma Rate converted from BitTypeCounter") {
-    val bitTypeCounters: BitTypeCounters = BitTypeCounters(List(
-      BitTypeCounter(5, 3),
-      BitTypeCounter(6, 2),
-      BitTypeCounter(3, 5),
-      BitTypeCounter(2, 8),
-      BitTypeCounter(2, 2)
-    ))
+    val diagnostics = TEST_INPUT
+      .map(BinaryCoding.apply)
+      .toDiagnostics
 
-    val expected = BinaryCoding(List(Zero, Zero, One, One, One))
-    val gammaRate = bitTypeCounters.gammaRate
+    val expected = BinaryCoding(List(One, Zero, One, One, Zero))
+    val gammaRate = diagnostics.gammaRate
 
     assertEquals(gammaRate, expected)
   }
 
   test("Episolon Rate converted from BitTypeCounter") {
-    val bitTypeCounters: BitTypeCounters = BitTypeCounters(List(
-      BitTypeCounter(5, 3),
-      BitTypeCounter(6, 2),
-      BitTypeCounter(3, 5),
-      BitTypeCounter(2, 8),
-      BitTypeCounter(2, 2)
-    ))
+    val diagnostics = TEST_INPUT
+      .map(BinaryCoding.apply)
+      .toDiagnostics
 
-    val expected = BinaryCoding(List(One, One, Zero, Zero, Zero))
-    val epsilonRate = bitTypeCounters.epsilonRate
-
+    val expected = BinaryCoding(List(Zero, One, Zero, Zero, One))
+    val epsilonRate = diagnostics.epsilonRate
 
     assertEquals(epsilonRate, expected)
   }
 
-  test("End to end test with test input case") {
-    val bitTypeCounters = TEST_INPUT
+  test("End to end test with test input case for power consumption") {
+    val diagnostics = TEST_INPUT
       .map(BinaryCoding.apply)
-      .sumBinaryCodingColumns
+      .toDiagnostics
 
-    val gammRate = bitTypeCounters.gammaRate.toInt
-    val epsilonRate = bitTypeCounters.epsilonRate.toInt
-    val powerConsumption = bitTypeCounters.powerConsumption
+    val gammRate = diagnostics.gammaRate.toInt
+    val epsilonRate = diagnostics.epsilonRate.toInt
+    val powerConsumption = diagnostics.powerConsumption
 
     val expectedGammarate = 22
     val expectedEpsilonRate = 9
@@ -120,7 +112,21 @@ class BinaryDiagnosticTest extends munit.FunSuite {
     assertEquals(powerConsumption, expectedPowerRate)
   }
 
-  test("[TODO] Calculate power consumption") {
+  test("Calculate the Oxygen Generator Rating based on TEST_INPUT expected output 23") {
+    val expectedOxygenRating = 23
+
+    assert(false)
+  }
+
+  test("Calculate the CO2 Scrubber Rating from TEST_INPUT expected output is 10") {
+    val expectedCO2Rating = 10
+
+    assert(false)
+  }
+
+  test("Calculate the life support rating from TEST_INPUT which should be 23 * 10 or 23") {
+    val expectedLifeSupportRating = 230
+
     assert(false)
   }
 }
