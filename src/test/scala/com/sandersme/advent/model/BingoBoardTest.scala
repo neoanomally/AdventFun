@@ -57,6 +57,28 @@ class BingoBoardTest extends munit.FunSuite {
   }
 
   test("Score the board based on the last ball called") {
-    assert(false)
+    val expectedScoreLastBallCalled22 = TEST_INPUT.tail.flatten.sum * 22
+    val boardUpdates = TEST_INPUT.head
+    val twentyTwo = 22
+    val boardAfterUpdate = boardUpdates
+      .foldRight(board)((drawingBall, updatedBoard) =>
+        updatedBoard.updateBoard(drawingBall))
+
+    val scoreResults = boardAfterUpdate.score
+
+    assertEquals(scoreResults, expectedScoreLastBallCalled22)
+  }
+
+  test("Validate the winning Number of a Board equal to 22") {
+    val expectedWinningNumber = 22
+    val boardUpdates = TEST_INPUT.head.reverse
+
+    val boardAfterUpdate = boardUpdates
+      .foldLeft(board)((updatedBoard, drawingBall) =>
+        updatedBoard.updateBoard(drawingBall))
+
+    val winningNumber = boardAfterUpdate.winningNumber.get
+
+    assertEquals(winningNumber, expectedWinningNumber)
   }
 }

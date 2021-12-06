@@ -1,5 +1,7 @@
 package com.sandersme.advent.model
 
+import com.sandersme.advent.model.BingoSubsystem.drawUpdateUntilWinner
+
 class BingoSubsystemTest extends munit.FunSuite {
   val TEST_INPUT: List[String] = List(
     "7,4,9,5,11,17,23,2,0,14,21,24,10,16,13,6,15,25,12,22,18,20,8,19,3,26,1", "",
@@ -20,14 +22,14 @@ class BingoSubsystemTest extends munit.FunSuite {
     "2  0 12  3  7"
   )
 
-  val bingoSubsystem: BingoSubsystem = BingoSubsystem.parseInput(TEST_INPUT)
+  val stubBingoSubsystem: BingoSubsystem = BingoSubsystem.fromInput(TEST_INPUT)
 
     test("Validate can parse Input") {
       val expectedNumberOfBoards = 3
       val expectedNumberOfDrawingBalls = 27
 
-      assertEquals(bingoSubsystem.numberOfDrawingBalls, expectedNumberOfDrawingBalls)
-      assertEquals(bingoSubsystem.numberOfBoards, expectedNumberOfBoards)
+      assertEquals(stubBingoSubsystem.numberOfDrawingBalls, expectedNumberOfDrawingBalls)
+      assertEquals(stubBingoSubsystem.numberOfBoards, expectedNumberOfBoards)
     }
 
   test("Update all boards with some number") {
@@ -35,9 +37,9 @@ class BingoSubsystemTest extends munit.FunSuite {
     val expectedNumberOfBallsLeft = 26 // Make sure we are decrementing
     val expectedNumberOfNewBoardsMarked = 0
     val expectedNumberOfUpdatedBoardsMarked = 3
-    val newNumberOfBoardsMarked = bingoSubsystem.boards.map(_.numberOfMarkedCells).sum
+    val newNumberOfBoardsMarked = stubBingoSubsystem.boards.map(_.numberOfMarkedCells).sum
 
-    val updatedBoardSubsystem = bingoSubsystem.drawAndUpdateBoards // Should be 7
+    val updatedBoardSubsystem = stubBingoSubsystem.drawAndUpdateBoards // Should be 7
     val updatedNumberOfBoardsMarked = updatedBoardSubsystem.boards.map(_.numberOfMarkedCells).sum
     val updatedNumberOfBallsLeft = updatedBoardSubsystem.numberOfDrawingBalls
 
@@ -46,11 +48,67 @@ class BingoSubsystemTest extends munit.FunSuite {
     assertEquals(updatedNumberOfBallsLeft, expectedNumberOfBallsLeft)
   }
 
-  test("Keep updating boards until we find a winner and grab that board") {
-    assert(false)
+  test("Update all the boards and have no winner") {
+    val updatedOnceShouldHaveNoWinner = stubBingoSubsystem
+      .drawAndUpdateBoards.anyBoardHasWinner
+
+    val expectedNoWinner = false
+
+    assertEquals(updatedOnceShouldHaveNoWinner, expectedNoWinner)
   }
 
-  test("Score board with the ball that was used to score last") {
+  test("Calculate the score of the winning board based on test input cases") {
+    val bingoSubsystemAtWinner = stubBingoSubsystem.drawUntilWinner
+    val expectedWinningScore = 4512
 
+    val winningScore = bingoSubsystemAtWinner.winningBoardScore.getOrElse(0)
+
+    assertEquals(winningScore, expectedWinningScore)
+  }
+
+  test("Draw board has a winner and check the winning ball") {
+    val startingBingoSubsytemIsNotAWinner = stubBingoSubsystem.anyBoardHasWinner
+    val expectedNoWinner = false
+    val expectedWinner = true
+
+    val bingoSubsystemAtWinner = stubBingoSubsystem.drawUntilWinner
+    val winningBallNumber = bingoSubsystemAtWinner.currentBall
+    val expectedWinningBall = 24
+
+    assertEquals(startingBingoSubsytemIsNotAWinner, expectedNoWinner)
+    assertEquals(winningBallNumber, expectedWinningBall)
+  }
+
+  test("Draw balls until there are none left and that the drawn balls are there") {
+    val numberOfDrawingBallsStart = stubBingoSubsystem.numberOfDrawingBalls
+    val drawnSubsystem = stubBingoSubsystem.drawAllBalls
+    val numberOfDrawingBallsEnd = drawnSubsystem.numberOfDrawingBalls
+
+    val expectedStartingNumberOfBalls = 27
+    val expectedNumberOfBallsAfterDrawingEnd = 0
+
+    val numberOfBallsCalled = drawnSubsystem.calledDrawingNumbers.size
+
+    assertEquals(numberOfDrawingBallsStart, 27)
+    assertEquals(numberOfDrawingBallsEnd, expectedNumberOfBallsAfterDrawingEnd)
+    assertEquals(numberOfBallsCalled, numberOfDrawingBallsStart)
+  }
+
+
+  test("Validate the order that balls were drawn are the same as the previous balls called after drawn") {
+    val expectedOutput = stubBingoSubsystem.drawingNumbers
+    val results = stubBingoSubsystem.drawAllBalls.calledDrawingNumbers
+
+    assertEquals(expectedOutput, results)
+  }
+
+  test("Find the last won board should equal 1924") {
+    val lastWonBoard = stubBingoSubsystem
+      .drawAllBalls
+      .findTheLastWonBoard
+
+    val expectedFinalScoreOfBoard = 1924
+
+    assertEquals(lastWonBoard.score, expectedFinalScoreOfBoard)
   }
 }
