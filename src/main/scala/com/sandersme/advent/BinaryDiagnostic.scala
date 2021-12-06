@@ -55,8 +55,16 @@ To find CO2 scrubber rating, determine the least common value (0 or 1) in the cu
     val gammRate = diagnostics.gammaRate
     val epsilonRate = diagnostics.epsilonRate
     val powerConsumption = diagnostics.powerConsumption
+    val oxygenRating = diagnostics.oxygenGeneratorRating
+    val co2ScrubberRating = diagnostics.co2ScrubberRating
+    val lifeSupportRating = diagnostics.lifeSupportRating
 
     println(s"Here is our bit counters $diagnostics")
+    println(s"Gamma Rate: $gammRate")
+    println(s"Episolon Rate: $epsilonRate")
     println(s"Power consumption $powerConsumption")
+    println(s"Oxygen Generator Rating: $oxygenRating")
+    println(s"CO2 Scrubber Rating: $co2ScrubberRating")
+    println(s"Life Support Rating: $lifeSupportRating")
   }
 }

@@ -18,22 +18,19 @@ class DiagnosticsTest extends munit.FunSuite {
     "01010"
   )
 
+  lazy val TEST_DIAGNOSTICS = Diagnostics.fromBinaryInput(TEST_INPUT)
+
 
   test("Gamma Rate converted from BitTypeCounter") {
-    val diagnostics = Diagnostics.fromBinaryInput(TEST_INPUT)
-
-
     val expected = BinaryCoding(List(One, Zero, One, One, Zero))
-    val gammaRate = diagnostics.gammaRate
+    val gammaRate = TEST_DIAGNOSTICS.gammaRate
 
     assertEquals(gammaRate, expected)
   }
 
   test("Episolon Rate converted from BitTypeCounter") {
-    val diagnostics = Diagnostics.fromBinaryInput(TEST_INPUT)
-
     val expected = BinaryCoding(List(Zero, One, Zero, Zero, One))
-    val epsilonRate = diagnostics.epsilonRate
+    val epsilonRate = TEST_DIAGNOSTICS.epsilonRate
 
     assertEquals(epsilonRate, expected)
   }
@@ -42,7 +39,7 @@ class DiagnosticsTest extends munit.FunSuite {
    * TODO MOVE Diagnostics Specific tests to it's own test file
    */
   test("End to end test with test input case for power consumption") {
-    val diagnostics = Diagnostics.fromBinaryInput(TEST_INPUT)
+    val diagnostics = TEST_DIAGNOSTICS
 
     val gammRate = diagnostics.gammaRate.toInt
     val epsilonRate = diagnostics.epsilonRate.toInt
@@ -57,22 +54,32 @@ class DiagnosticsTest extends munit.FunSuite {
     assertEquals(powerConsumption, expectedPowerRate)
   }
 
+  test("Binary coding of the TEST_INPUT should be five") {
+    val binaryLength = TEST_DIAGNOSTICS.binaryLength
+    val expectedLength = 5
+
+    assertEquals(binaryLength, expectedLength)
+  }
+
 
   test("Calculate the Oxygen Generator Rating based on TEST_INPUT expected output 23") {
     val expectedOxygenRating = 23
+    val oxygenGeneratorRating = TEST_DIAGNOSTICS.oxygenGeneratorRating
 
-    assert(false)
+    assertEquals(oxygenGeneratorRating, expectedOxygenRating)
   }
 
   test("Calculate the CO2 Scrubber Rating from TEST_INPUT expected output is 10") {
     val expectedCO2Rating = 10
+    val co2Rating = TEST_DIAGNOSTICS.co2ScrubberRating
 
-    assert(false)
+    assertEquals(co2Rating, expectedCO2Rating)
   }
 
   test("Calculate the life support rating from TEST_INPUT which should be 23 * 10 or 23") {
     val expectedLifeSupportRating = 230
+    val lifeSupportRating = TEST_DIAGNOSTICS.lifeSupportRating
 
-    assert(false)
+    assertEquals(lifeSupportRating, expectedLifeSupportRating)
   }
 }
