@@ -23,6 +23,16 @@ object HydrothermalVenture {
    * To avoid the most dangerous areas, you need to determine the number of points where at least two lines
    * overlap. In the above example, this is anywhere in the diagram with a 2 or larger - a total of 5 points.
    * Consider only horizontal and vertical lines. At how many points do at least two lines overlap?
+   *
+   * Unfortunately, considering only horizontal and vertical lines doesn't give you the full picture; you need
+   * to also consider diagonal lines.
+   * Because of the limits of the hydrothermal vent mapping system, the lines in your list will only ever be
+   * horizontal, vertical, or a diagonal line at exactly 45 degrees. In other words:
+   * An entry like 1,1 -> 3,3 covers points 1,1, 2,2, and 3,3.
+   * An entry like 9,7 -> 7,9 covers points 9,7, 8,8, and 7,9.
+   * Considering all lines from the above example would now produce the following diagram:
+
+
    */
 
   def main(args: Array[String]): Unit = {

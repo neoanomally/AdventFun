@@ -1,5 +1,9 @@
 package com.sandersme.advent.model
 
+import junit.framework.Assert.assertEquals
+import junit.framework.TestCase.assertFalse
+import junit.framework.TestCase.assertTrue
+
 class VentLineTest extends munit.FunSuite {
   val TEST_INPUT = """0,9 -> 5,9
                      |8,0 -> 0,8
@@ -46,11 +50,58 @@ class VentLineTest extends munit.FunSuite {
     assertEquals(linePoints, expectedEmpty)
   }
 
-  test("For each Ventline Calculate all overlapping points") {
+  test("9,5 and 5,9 are diagnal to one another") {
+    val ventLine =  VentLine(Point(9, 5), Point(5, 9))
+    val isDiagonal = ventLine.isDiagonalLine
+
+    assertTrue(isDiagonal)
+  }
+
+  test("9,5 and 6, 1 are not diagnal to one another") {
+    val ventLine =  VentLine(Point(9, 5), Point(6, 1))
+    val isDiagonal = ventLine.isDiagonalLine
+
+    assertFalse(isDiagonal)
+  }
+
+  test("For each Ventline Calculate all overlapping points without diagonal line") {
     val ventLines: List[VentLine] = VentLine.parseInputs(TEST_INPUT)
     val expectedNumberOfOverlappingPoints = 5
 
-    val numberOfOverlappingPoints = VentLine.countNumberOfOverlappingPoints(ventLines)
+    val numberOfOverlappingPoints = VentLine
+      .countNumberOfOverlappingPoints(ventLines,ventline =>
+        ventline.generateAllVerticalAndHorizontalPoints)
+
     assertEquals(numberOfOverlappingPoints, expectedNumberOfOverlappingPoints)
+  }
+
+  test("For each Ventline Calculate all overlapping points with diagonal line") {
+    val ventLines: List[VentLine] = VentLine.parseInputs(TEST_INPUT)
+    val expectedNumberOfOverlappingPoints = 12
+
+    val numberOfOverlappingPoints = VentLine
+      .countNumberOfOverlappingPoints(ventLines)
+
+    assertEquals(numberOfOverlappingPoints, expectedNumberOfOverlappingPoints)
+  }
+
+  test("Should generate points for VentLine(Point(0, 9), Point(5, 9))") {
+    val ventLine = VentLine(Point(0, 9), Point(5, 9))
+    val ventLineB = VentLine(Point(5, 9), Point(0, 9))
+    val generatedPoints = ventLine.generateAllLinePoints
+    val generatedPointsB = ventLineB.generateAllLinePoints.reverse
+
+    assertEquals(generatedPoints, generatedPointsB)
+  }
+
+
+  test("Test generating range 1 to 5 and 5 to 1 should equal the same") {
+    val a = VentLine.generateRange(1, 5)
+    val reversedB = VentLine.generateRange(5, 1).reverse
+
+    val expectedSize = 5
+
+    assertEquals(a, reversedB)
+    assertEquals(a.size, expectedSize)
   }
 }

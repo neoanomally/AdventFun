@@ -24,4 +24,5 @@ sbt test
 1. Day One: `sbt "runMain com.sandersme.advent.SonarSweep"`
 2. Day Two: `sbt "runMain com.sandersme.advent.Dive"`
 3. Day Three: `sbt "runMain com.sandersme.advent.BinaryDiagnostic"`
-4. Day Four: `sbt "runMain com.sandersme.advent.GiantSquidBingo`
+4. Day Four: `sbt "runMain com.sandersme.advent.GiantSquidBingo"`
+5. Day Five: `sbt "runMain com.sandersme.advent.HydrothermalVenture"`
