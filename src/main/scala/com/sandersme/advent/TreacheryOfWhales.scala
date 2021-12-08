@@ -1,5 +1,7 @@
 package com.sandersme.advent
 
+import com.sandersme.advent.model.CrabMovement
+
 object TreacheryOfWhales {
 
   /**
@@ -45,6 +47,13 @@ object TreacheryOfWhales {
    */
   def main(args: Array[String]): Unit = {
     val input: String = Input.readFromDataResource("day7_input").head
+
+    val crabMovement = CrabMovement.parseInput(input)
+    val optimalMovementCost = crabMovement.findMinimalFuelPosition
+
+    println(s"Optimal Horizontal Location and Fuel Cost: $optimalMovementCost")
   }
+
+
 
 }
