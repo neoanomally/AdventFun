@@ -1,6 +1,6 @@
 package com.sandersme.advent.model
 
-import com.sandersme.advent.model.CrabMovement.MovementCost
+import com.sandersme.advent.model.CrabMovement.{MovementCost, calculateFuelCost}
 
 /**
  * This is going to contain the logic for how we move crabs across a horizontal plane.
@@ -14,6 +14,8 @@ case class CrabMovement(crabs: List[Int]) {
   /**
    * Start with max value movement and fold through each position until  we find the optimal
    * horizontal position.
+   *
+   * TODO early escaping of the total cost already outweighs the smallest bit.
    * @return the optimal MovementCost
    */
   def findMinimalFuelPosition: MovementCost = {
@@ -21,17 +23,37 @@ case class CrabMovement(crabs: List[Int]) {
     val end = crabs.max
     val DEFAULT_MOVEMENT_COST = MovementCost()
 
+    val stepsFuelCostMap: Map[Int, Int] = generateFuelCostMap(start, end)
+
     (start to end)
       .foldLeft(DEFAULT_MOVEMENT_COST){ case (movementCost, nextPosition) =>
 
-        val cost = crabs.map(position => Math.abs(nextPosition - position)).sum
-        if (cost < movementCost.cost) {
-          MovementCost(nextPosition, cost)
+        val totalCost = crabs.map { position =>
+          val steps = Math.abs(nextPosition - position)
+          stepsFuelCostMap(steps)
+        }.sum
+
+        if (totalCost < movementCost.cost) {
+          MovementCost(nextPosition, totalCost)
         } else {
           movementCost
         }
       }
   }
+
+  private[model] def generateFuelCostMap(start: Int, end: Int): Map[Int, Int] = {
+    (start to end)
+      .foldLeft(Map(0 -> 0)){ case(fuelCostMap, nextStep) =>
+        if (fuelCostMap.contains(nextStep - 1)) {
+          val fuelCost = fuelCostMap(nextStep - 1) + nextStep
+          fuelCostMap + (nextStep -> fuelCost)
+        } else {
+          fuelCostMap + (nextStep -> calculateFuelCost(0, nextStep))
+        }
+      }
+  }
+
+
 }
 
 object CrabMovement {
@@ -43,5 +65,14 @@ object CrabMovement {
         .map(_.toInt)
         .toList
     )
+  }
+
+  def calculateFuelCost(start: Int, stop: Int): Int = {
+    val numberOfSteps = Math.abs(start - stop)
+
+    (1 to numberOfSteps)
+      .zipWithIndex
+      .map{ case(_, idx) => idx + 1}
+      .sum
   }
 }
