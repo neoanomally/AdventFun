@@ -27,3 +27,5 @@ sbt test
 4. Day Four: `sbt "runMain com.sandersme.advent.GiantSquidBingo"`
 5. Day Five: `sbt "runMain com.sandersme.advent.HydrothermalVenture"`
 6. Day Six: `sbt "runMain com.sandersme.advent.SpawningLanternfish"`
+7. Day seve: `sbt "runMain  com.sandersme.advent.TreacheryOfWhales"`
+8. Day Eight: `sbt "runMain com.sandersme.advent.SevenSegmentSearch`
