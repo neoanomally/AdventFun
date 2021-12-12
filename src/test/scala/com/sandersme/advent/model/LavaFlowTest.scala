@@ -12,7 +12,7 @@ class LavaFlowTest extends munit.FunSuite {
   test("Lava flow parseInput returns back a lava flow object") {
     val testInput: Array[String] = Array("1039209503509305934", "1039209503509306789")
     val lavaFlow: LavaFlow = LavaFlow.parseInput(testInput)
-    println(lavaFlow.flows)
+
     assertEquals(lavaFlow.flows.length, 2)
   }
 
@@ -26,7 +26,11 @@ class LavaFlowTest extends munit.FunSuite {
   }
 
   test("Find all the basins within an area") {
-    ???
+    val lavaFlow = PARSED_LAVA_FLOW
+    val basinsProduct = lavaFlow.calculateProductTopThreeBasins
+    val expectedValue = 1134
+
+    assertEquals(basinsProduct, expectedValue)
   }
 
 }

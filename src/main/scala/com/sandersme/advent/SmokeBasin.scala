@@ -39,9 +39,11 @@ object SmokeBasin {
     val input = Input.readFromDataResource("day9_input")
 
     val lavaFlow = LavaFlow.parseInput(input.toArray)
-
     val sumRisk = lavaFlow.calculateSumRisk
+    val topThreeBasinsProduct = lavaFlow.calculateProductTopThreeBasins
 
     println(s"The sum risk of the lava caves is $sumRisk")
+    println(s"The product of the top three basins is: $topThreeBasinsProduct")
+
   }
 }
