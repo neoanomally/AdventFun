@@ -9,6 +9,7 @@ case class Brackets(values: List[Bracket]) // todo we will use some other datast
 
 object Brackets {
   case class BracketAccumulator(bracketStack: Stack[Bracket], stoppedBracket: Option[Bracket])
+  case class CompletedErrorCodes(expectedBrackets: List[Bracket], score: Long)
 
   enum Bracket(val typeOf: Char) {
     case LeftAngle extends Bracket('<')
@@ -97,18 +98,58 @@ object Brackets {
     }
   }
 
+  def calculateMiddleScore(completedErrorCodes: List[CompletedErrorCodes]): Long = {
+    val sortedScores = completedErrorCodes
+      .sortBy(_.score)
+
+    sortedScores(sortedScores.length / 2).score
+  }
+
   /** Each bracket type has it's own score, we multiply it by the number of the type
    * we found then add them all */
-  def calculateScore(inputBrackets: List[Brackets]): Int = {
+  def calculateCorruptedScore(inputBrackets: List[Brackets]): Int = {
     inputBrackets
       .map(Brackets.validateErrorCodes)
       .filter(validator => validator.stoppedBracket.isDefined)
       .flatMap(_.stoppedBracket)
-      .map(lookupBracketScore)
+      .map(lookupCorruptedBracketScore)
       .sum
   }
 
-  private def lookupBracketScore(bracket: Bracket): Int = bracket match {
+  def calculateIncompleteScores(inputBrackets: List[Brackets]): List[CompletedErrorCodes] = {
+    inputBrackets
+      .map(Brackets.validateErrorCodes)
+      .filter(_.stoppedBracket.isEmpty)
+      .map(completeIncompleteCode)
+      .map(completeErrorCodeScores)
+  }
+
+  private def completeErrorCodeScores(completedBrackets: List[Bracket]): CompletedErrorCodes = {
+    val score = completedBrackets
+      .map(lookupIncompleteBracketScore)
+      .foldLeft(0L){case (acc, score) => (acc * 5) + score}
+
+    CompletedErrorCodes(completedBrackets, score)
+  }
+
+  def completeIncompleteCode(accumulator: BracketAccumulator): List[Bracket] = {
+    accumulator
+      .bracketStack
+      .popAll()
+      .reverse
+      .map(Brackets.findOppositeBracket)
+      .toList
+  }
+
+  private def lookupIncompleteBracketScore(bracket: Bracket): Int = bracket match {
+    case RightRound => 1
+    case RightSquare => 2
+    case RightCurly => 3
+    case RightAngle => 4
+    case _ => 0
+  }
+
+  private def lookupCorruptedBracketScore(bracket: Bracket): Int = bracket match {
     case RightRound => 3
     case RightSquare => 57
     case RightCurly => 1197

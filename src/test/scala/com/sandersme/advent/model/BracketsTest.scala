@@ -66,17 +66,30 @@ class BracketsTest extends munit.FunSuite {
     assertEquals(validatorCorrupted.stoppedBracket, Some(Bracket.RightCurly))
   }
 
-  // TODO: Hey, you add this to a miain method somewhere :D 
+  // TODO: Hey, you add this to a miain method somewhere :D
   test("Calculate the total from the error codes") {
-    val score = Brackets.calculateScore(TEST_BRACKETS)
+    val score = Brackets.calculateCorruptedScore(TEST_BRACKETS)
 
     assertEquals(score, 26397)
+  }
 
-    import com.sandersme.advent.Input
-    val input = Input.readFromDataResource("day10_input")
-    val bracketsInput = Brackets.parseInput(input)
-    val inputScore = Brackets.calculateScore(bracketsInput)
+  test("Calculate the completed codes for incomplete error codes") {
+    import Bracket._
+    val completedErrorCodes = Brackets.calculateIncompleteScores(TEST_BRACKETS)
 
-    println(s"input score: $inputScore")
+    val headExpected = CompletedErrorCodes(
+      List(RightCurly, RightCurly, RightSquare, RightSquare,
+        RightRound, RightCurly, RightRound, RightSquare), 288957
+    )
+
+    assertEquals(completedErrorCodes.head, headExpected)
+  }
+
+  test("Complete Median Scores from incompleted error codes") {
+    val completedErrorCodes = Brackets.calculateIncompleteScores(TEST_BRACKETS)
+
+    val medianScore = calculateMiddleScore(completedErrorCodes)
+
+    assertEquals(medianScore, 288957L)
   }
 }

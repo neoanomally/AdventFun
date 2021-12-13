@@ -1,5 +1,7 @@
 package com.sandersme.advent
 
+import com.sandersme.advent.model.Brackets
+
 /**
  * --- Day 10: Syntax Scoring ---
  * You ask the submarine to determine the best route out of the deep-sea cave, but it only replies:
@@ -68,7 +70,22 @@ package com.sandersme.advent
  *
  * Find the first illegal character in each corrupted line of the navigation
  * subsystem. What is the total syntax error score for those errors?
- */
-class SyntaxScoring {
+ **/
+object SyntaxScoring {
+ def main(args: Array[String]): Unit = {
+  val input = Input.readFromDataResource("day10_input")
+  val bracketsInput = Brackets.parseInput(input)
+
+  val inputScore = Brackets.calculateCorruptedScore(bracketsInput)
+  val incompleteScores = Brackets.calculateIncompleteScores(bracketsInput)
+  val medianScore = Brackets.calculateMiddleScore(incompleteScores)
+
+  incompleteScores.foreach{ incompleteScore =>
+   println(s"Incomplete Score $incompleteScore")
+  }
+
+  println(s"\nCorrupted overall score: $inputScore")
+  println(s"Median Score for completed error codes: $medianScore")
+ }
 
 }
