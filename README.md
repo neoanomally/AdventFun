@@ -21,11 +21,14 @@ sbt test
 ```
 
 ## Running the various Days:
-1. Day One: `sbt "runMain com.sandersme.advent.SonarSweep"`
-2. Day Two: `sbt "runMain com.sandersme.advent.Dive"`
-3. Day Three: `sbt "runMain com.sandersme.advent.BinaryDiagnostic"`
-4. Day Four: `sbt "runMain com.sandersme.advent.GiantSquidBingo"`
-5. Day Five: `sbt "runMain com.sandersme.advent.HydrothermalVenture"`
-6. Day Six: `sbt "runMain com.sandersme.advent.SpawningLanternfish"`
-7. Day seve: `sbt "runMain  com.sandersme.advent.TreacheryOfWhales"`
-8. Day Eight: `sbt "runMain com.sandersme.advent.SevenSegmentSearch`
+1.   Day One:    `sbt "runMain com.sandersme.advent.SonarSweep"`
+2.   Day Two:    `sbt "runMain com.sandersme.advent.Dive"`
+3.   Day Three:  `sbt "runMain com.sandersme.advent.BinaryDiagnostic"`
+4.   Day Four:   `sbt "runMain com.sandersme.advent.GiantSquidBingo"`
+5.   Day Five:   `sbt "runMain com.sandersme.advent.HydrothermalVenture"`
+6.   Day Six:    `sbt "runMain com.sandersme.advent.SpawningLanternfish"`
+7.   Day Seven:  `sbt "runMain  com.sandersme.advent.TreacheryOfWhales"`
+8.   Day Eight:  `sbt "runMain com.sandersme.advent.SevenSegmentSearch"`
+9.   Day Nine:   `sbt "runMain com.sandersme.advent.SmokeBasin"`
+10.  Day Ten:    `sbt "runMain com.sandersme.advent.SyntaxScoring"`
+11.  Day Eleven: `sbt "runMain com.sandersme.advent.DumboOctopus"` 
