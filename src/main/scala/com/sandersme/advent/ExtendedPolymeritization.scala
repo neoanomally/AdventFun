@@ -1,5 +1,6 @@
 package com.sandersme.advent
 
+import com.sandersme.advent.model.Polymizer
 
 /**
  * * The incredible pressures at this depth are starting to put a strain on your
@@ -50,6 +51,11 @@ package com.sandersme.advent
  */
 object ExtendedPolymeritization {
   def main(args: Array[String]): Unit = {
+    val input = Input.readFromDataResource("day14_input")
+    val polymizer = Polymizer.parseInput(input)
 
+    val tenStepPolymizer = Polymizer.applyInsertionRuleNSteps(polymizer, 10)
+
+    println(s"The difference between the most common and least common element: ${tenStepPolymizer.diffMaxMin}")
   }
 }
