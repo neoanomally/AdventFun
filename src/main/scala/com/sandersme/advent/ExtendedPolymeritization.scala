@@ -57,5 +57,9 @@ object ExtendedPolymeritization {
     val tenStepPolymizer = Polymizer.applyInsertionRuleNSteps(polymizer, 10)
 
     println(s"The difference between the most common and least common element: ${tenStepPolymizer.diffMaxMin}")
+
+    val fortyStepPolymizer = Polymizer.applyInsertionRuleNSteps(polymizer, 40)
+
+    println(s"The difference between the most common and least common element: ${fortyStepPolymizer.diffMaxMin}")
   }
 }
