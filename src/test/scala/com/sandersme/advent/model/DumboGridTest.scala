@@ -1,6 +1,7 @@
 package com.sandersme.advent.model
 
-import DumboGrid.{Node, increaseEnergyAllNodes, releaseEnergy}
+import DumboGrid.{DumboNode, increaseEnergyAllNodes, releaseEnergy}
+import com.sandersme.advent.graph.Point
 
 class DumboGridTest extends munit.FunSuite {
   val TEST_INPUT = List(   "5483143223",
@@ -101,11 +102,11 @@ class DumboGridTest extends munit.FunSuite {
     val nodesWithIncreasedEnergy = DumboGrid.increaseEnergyAllNodes(TEST_DUMBO_GRID.nodes)
 
     val node3x0y = nodesWithIncreasedEnergy.head(2)
-    val expectedNode3 = Node(9,
+    val expectedNode3 = DumboNode(9,
       List(Point(1, 0), Point(1, 1), Point(2, 1), Point(3, 0), Point(3, 1)), false, 0, false)
 
     val node3x1y = nodesWithIncreasedEnergy(1)(2)
-    val expected3x1y = Node(5, List(Point(1, 0), Point(1, 1), Point(1, 2), Point(2, 0),
+    val expected3x1y = DumboNode(5, List(Point(1, 0), Point(1, 1), Point(1, 2), Point(2, 0),
       Point(2, 2), Point(3, 0), Point(3, 1), Point(3, 2)), false, 0)
 
     assertEquals(node3x0y, expectedNode3)
@@ -129,27 +130,14 @@ class DumboGridTest extends munit.FunSuite {
   }
 
   test("Update node should increment node and any values") {
-    val testNode = Node(8, List.empty)
+    val testNode = DumboNode(8, List.empty)
     val updatedNode = DumboGrid.updateNode(testNode)
-    val expectedNode = Node(9, List.empty, false, 0)
+    val expectedNode = DumboNode(9, List.empty, false, 0)
 
     val updatedTwiceNode = DumboGrid.updateNode(updatedNode)
-    val expectedUpdatedTwiceNode = Node(10, List.empty, true, 1)
+    val expectedUpdatedTwiceNode = DumboNode(10, List.empty, true, 1)
 
     assertEquals(updatedNode, expectedNode)
     assertEquals(updatedTwiceNode, expectedUpdatedTwiceNode)
-  }
-
-  test("Check generating all points") {
-    val generatedValues = DumboGrid.generateNeighborValues(1, 1, 10, 10)
-    val generatedValuesZeroZero = DumboGrid.generateNeighborValues(0, 0, 10, 10)
-    val generatedValuesElevens = DumboGrid.generateNeighborValues(11, 11, 10, 10)
-    val generatedValuesTens = DumboGrid.generateNeighborValues(10, 10, 10, 10)
-
-    assertEquals(generatedValues.size, 8)
-    assertEquals(generatedValues.contains(Point(1, 1)), false)
-    assertEquals(generatedValuesZeroZero.size, 3)
-    assertEquals(generatedValuesElevens.size, 0)
-    assertEquals(generatedValuesTens.size, 1)
   }
 }

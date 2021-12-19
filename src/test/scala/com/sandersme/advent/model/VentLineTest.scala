@@ -1,5 +1,6 @@
 package com.sandersme.advent.model
 
+import com.sandersme.advent.graph.Point
 import junit.framework.Assert.assertEquals
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertTrue

@@ -1,4 +1,6 @@
-package com.sandersme.advent.model
+package com.sandersme.advent.graph
+
+import com.sandersme.advent.graph.Point
 
 class PointTest extends munit.FunSuite {
 

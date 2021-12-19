@@ -1,11 +1,12 @@
 package com.sandersme.advent.model
 
-import com.sandersme.advent.model.DumboGrid.Node
+import com.sandersme.advent.graph.{Node, Point, Grid}
+import com.sandersme.advent.model.DumboGrid.DumboNode
 
 import scala.annotation.tailrec
 
 
-case class DumboGrid(nodes: List[List[Node]], haveAllFlashed: Boolean = false,
+case class DumboGrid(nodes: List[List[DumboNode]], haveAllFlashed: Boolean = false,
                      stepAllFlashed: Int = 0) {
   def totalNumberFlashes: Long = nodes.flatMap(_.map(_.numFlashes)).sum
 }
@@ -13,8 +14,8 @@ case class DumboGrid(nodes: List[List[Node]], haveAllFlashed: Boolean = false,
 object DumboGrid {
   // TODO: We need to update whether or not something flashed, and reset it after it's
   // flashed. That way we keep flashing as octopus energy increments
-  case class Node(value: Int, neighbors: List[Point], flashing: Boolean = false,
-                  numFlashes: Long = 0, alreadyFlashed: Boolean = false)
+  case class DumboNode(value: Int, neighbors: List[Point], flashing: Boolean = false,
+                       numFlashes: Long = 0, alreadyFlashed: Boolean = false) extends Node[Int]
 
   def energyIncrease(dumboGrid: DumboGrid): DumboGrid = {
     val nodesAfterEnergyIncrease = increaseEnergyAllNodes(dumboGrid.nodes)
@@ -36,7 +37,7 @@ object DumboGrid {
     }
   }
 
-  private[model] def increaseEnergyAllNodes(nodes: List[List[Node]]): List[List[Node]] = {
+  private[model] def increaseEnergyAllNodes(nodes: List[List[DumboNode]]): List[List[DumboNode]] = {
     nodes
       .map(_.map(node => updateNode(node)))
   }
@@ -46,7 +47,7 @@ object DumboGrid {
   // we are going to have to loop through each time to see if there was a single
   // flash... We might be able to do this with a var, but then we won't be pure. \
   @tailrec
-  private[model] def explodeAllNodes(nodes: List[List[Node]]): List[List[Node]] = {
+  private[model] def explodeAllNodes(nodes: List[List[DumboNode]]): List[List[DumboNode]] = {
     val updatedNodes = nodes.map(_.map { node =>
       if (node.flashing || node.alreadyFlashed) {
         node.copy(flashing = false, alreadyFlashed = true)
@@ -70,7 +71,7 @@ object DumboGrid {
    * @param node
    * @return
    */
-  private[model] def updateNode(node: Node, increment: Int = 1): Node = {
+  private[model] def updateNode(node: DumboNode, increment: Int = 1): DumboNode = {
     val updatedValue = node.value + increment
     val flashing = updatedValue > 9
     val numFlashes = if (flashing) node.numFlashes + 1 else node.numFlashes
@@ -79,7 +80,7 @@ object DumboGrid {
   }
 
   // TODO add test for reseting all exploded nodes value > 9
-  private[model] def releaseEnergy(nodes: List[List[Node]]): List[List[Node]] = {
+  private[model] def releaseEnergy(nodes: List[List[DumboNode]]): List[List[DumboNode]] = {
     nodes.map(_.map{ node =>
       if (node.value > 9)
         node.copy(value = 0, flashing = false, alreadyFlashed = false)
@@ -88,8 +89,8 @@ object DumboGrid {
     })
   }
 
-  private[model] def countFlashedNeighbors(node: Node,
-                                           nodes: List[List[Node]]): Int = {
+  private[model] def countFlashedNeighbors(node: DumboNode,
+                                           nodes: List[List[DumboNode]]): Int = {
 
     if (!node.flashing || !node.alreadyFlashed) {
       findAllNeighbors(nodes, node.neighbors).count(_.flashing)
@@ -98,13 +99,13 @@ object DumboGrid {
     }
   }
 
-  private[model] def hasAnyNeighborFlashed(nodes: List[List[Node]],
+  private[model] def hasAnyNeighborFlashed(nodes: List[List[DumboNode]],
                                            points: List[Point]): Boolean = {
     findAllNeighbors(nodes, points).exists(_.flashing)
   }
 
-  private[model] def findAllNeighbors(nodes: List[List[Node]],
-                                      points: List[Point]): List[Node] = {
+  private[model] def findAllNeighbors(nodes: List[List[DumboNode]],
+                                      points: List[Point]): List[DumboNode] = {
     points.map(point => nodes(point.y)(point.x))
   }
 
@@ -118,25 +119,12 @@ object DumboGrid {
 
     val nodes = inputValues.zipWithIndex.map{ case(rows, y) =>
       rows.zipWithIndex.map{ case(value, x) =>
-        val neighbors: List[Point] = generateNeighborValues(x, y, maxX, maxY)
+        val neighbors: List[Point] = Grid.generateNeighborValues(x, y, maxX, maxY)
 
-        Node(value, neighbors)
+        DumboNode(value, neighbors)
       }
     }
 
     DumboGrid(nodes)
-  }
-
-  private[model] def generateNeighborValues(x: Int, y: Int, maxX: Int, maxY: Int): List[Point] = {
-    val results = for {
-      xVal <- (-1 to 1).map(_ + x)
-      yVal <- (-1 to 1).map(_ + y)
-
-      if(xVal >= 0 && yVal >= 0) &&
-        (xVal < maxX && yVal < maxY) &&
-        (xVal != x || y != yVal)
-    }  yield Point(xVal, yVal)
-
-    results.toList
   }
 }

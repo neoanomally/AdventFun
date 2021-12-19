@@ -1,6 +1,8 @@
-package com.sandersme.advent.model
+package com.sandersme.advent.graph
 
 case class Point(x: Int, y: Int) {
+  override def toString: String = s"($x,$y)"
+
   def distance(otherPoint: Point): Double = {
     val xSquared = Math.pow(otherPoint.x - x, 2.0)
     val ySquared = Math.pow(otherPoint.y - y, 2.0)

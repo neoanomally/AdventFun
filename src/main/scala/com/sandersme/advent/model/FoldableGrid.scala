@@ -1,5 +1,7 @@
 package com.sandersme.advent.model
 
+import com.sandersme.advent.graph.Point
+
 import scala.annotation.tailrec
 
 
