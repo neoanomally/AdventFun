@@ -53,6 +53,11 @@ object CaveChitonRiskPath {
     val shortestRoute = findShortestRoute(chitonRiskPath)
 
     println(s"The shortest route risk is: ${shortestRoute.distanceToEnd}")
+
+    val largeChitonRiskPath = ChitonPath.parseInput(input, 5)
+    val largeShortestRoute = findShortestRoute(largeChitonRiskPath)
+
+    println(s"The shortest route risk for a 5x5 chiton grid is: ${largeShortestRoute.distanceToEnd}")
   }
 
 }

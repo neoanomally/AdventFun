@@ -46,6 +46,9 @@ type ChitonMatrix = Vector[Vector[GridNode]]
 type VisitedSet = Set[Point]
 type VisitedMap = Map[Point, Int]
 
+// TODO IT might be worth extracting ValueGrid into it's own class. Along with extending Grids
+type ValueGrid = Vector[Vector[Int]]
+
 object ChitonPath {
   case class ChitonRoute(location: Point, cost: Int)
   /**
@@ -98,19 +101,91 @@ object ChitonPath {
   }
 
 
-  def parseInput(input: List[String]): ChitonPath = {
-    val vectorGrid: Vector[Vector[Int]] =
-      input.map(_.toArray.map(_.asDigit).toVector).toVector
+  /**
+   * We can take our matrix and expend it up and down
+   * What I can do is transform the matrix {x} times
+   * memoize that matrix up to {n} times.
+   * 0 -> 4
+   * 1 -> 5
+   * 2 -> 6
+   * 3 -> 7
+   * 4 -> 8
+   *
+   * 0 1 2 3 4
+   * 1 2 3 4 5
+   * 2 3 4 5 6
+   * 3 4 5 6 7
+   * 4 5 6 7 8
+   * TODO This could probably be broken into tow mehtods, one that expands rows by {x} length
+   * ANd the second method is one that will expand columns downwards by {x} roads.
+   * This should be an associative chain, so it doesn't matter which order it happens in.
+   * @param chitonPath
+   * @return
+   */
+  private[model] def extendGrid(valueGrid: ValueGrid, extendSize: Int): ValueGrid = {
+    val extendedByRows: ValueGrid = extendRows(valueGrid, extendSize)
+    val extendedByColumns: ValueGrid = extendColumns(extendedByRows, extendSize)
 
-    val maxX = vectorGrid.head.size
-    val maxY = vectorGrid.size
+    extendedByColumns
+  }
 
-    val matrix = vectorGrid.zipWithIndex.map{case (row, y) =>
+  private[model] def extendRows(chitonMatrix: ValueGrid, rowSize: Int): ValueGrid = {
+    val filledOutRows: ValueGrid = chitonMatrix.map{ row =>
+      (2 to rowSize).foldLeft(row){ case (accum, itr) =>
+        val newRow: Vector[Int] = row.map(value => updateGridValue(value, itr - 1))
+
+        accum ++ newRow
+      }
+    }
+
+    filledOutRows
+  }
+
+  /**
+   * @return
+   */
+  private[model] def extendColumns(original: ValueGrid, columnSize: Int): ValueGrid = {
+
+    (2 to columnSize).foldLeft(original){ (accum, itr) =>
+      val rowsToAppend: ValueGrid = original
+        .map(_.map(value => updateGridValue(value, itr - 1)))
+
+      val extendedOnce: ValueGrid = rowsToAppend.foldLeft(accum)((updatedAccum, row) =>
+        updatedAccum :+ row
+      )
+
+      extendedOnce
+    }
+  }
+
+  private[model] def updateGridValue(value: Int, increment: Int): Int = {
+    val incrementedValue = value + increment
+
+    val updatedValue: Int = if (incrementedValue > 9) incrementedValue - 9 else incrementedValue
+
+    updatedValue
+  }
+
+  private[model] def createMatrixFromGrid(valueGrid: ValueGrid): ChitonMatrix = {
+    val maxX = valueGrid.head.size
+    val maxY = valueGrid.size
+
+    val matrix: ChitonMatrix = valueGrid.zipWithIndex.map{case (row, y) =>
       row.zipWithIndex.map { case (value, x) =>
         val neighbors = Grid.generateNeighborsMinusDiagnonals(x, y, maxX, maxY)
         GridNode(value, neighbors, Point(x, y))
       }
     }
+
+    matrix
+  }
+
+  def parseInput(input: List[String], extendSize: Int = 1): ChitonPath = {
+    val vectorGrid: ValueGrid =
+      input.map(_.toArray.map(_.asDigit).toVector).toVector
+
+    val extendedGrid = extendGrid(vectorGrid, extendSize)
+    val matrix = createMatrixFromGrid(extendedGrid)
 
     val defaultRoute = ChitonRoute(Point(0, 0), 0)
 

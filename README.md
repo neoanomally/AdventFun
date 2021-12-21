@@ -35,3 +35,4 @@ sbt test
 12. Day Twelve:   `sbt "runMain com.sandersme.advent.PassagePathing"`
 13. Day Thirteen: `sbt "runMain com.sandersme.advent.TransparentOragami"`
 14. Day Fourteen: `sbt "runMain com.sandersme.advent.ExtendedPolymeritization"`
+15. Day Fifteen:  `sbt "runMain com.sandersme.advent.CaveChitonRiskPath"`
