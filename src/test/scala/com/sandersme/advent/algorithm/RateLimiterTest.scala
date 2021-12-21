@@ -23,7 +23,7 @@ class RateLimiterTest extends munit.FunSuite {
     }
 
     val expected = List(PASS, PASS, PASS, PASS, PASS, PASS, PASS, PASS, PASS, PASS, FAIL, FAIL, FAIL, FAIL, FAIL, FAIL,
-      FAIL, FAIL, FAIL, FAIL, PASS, PASS, PASS, PASS, PASS, PASS, PASS, PASS, PASS, FAIL, FAIL, FAIL, PASS, PASS)
+      FAIL, FAIL, FAIL, FAIL, PASS, PASS, PASS, PASS, PASS, PASS, PASS, PASS, PASS, PASS, FAIL, FAIL, PASS, PASS)
     assertEquals(results, expected)
   }
 

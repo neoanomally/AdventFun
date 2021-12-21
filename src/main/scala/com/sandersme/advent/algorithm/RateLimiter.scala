@@ -6,19 +6,17 @@ import org.scalacheck.Test.Failed
 import scala.annotation.tailrec
 import scala.collection.mutable
 import java.util.Collections
-import java.util.concurrent.LinkedBlockingDeque
+import java.util.concurrent.{ConcurrentLinkedQueue, LinkedBlockingDeque}
 import scala.concurrent.duration.Duration
 
 /**
- * TODO update this with an AtomicReference
+ * TODO Look at actual algorithms.
  * @param limitSize
  * @param durationInMs
  */
-class RateLimiter(private val limitSize: Long, private val durationInMs: Long) {
-  private[algorithm] val deque: LinkedBlockingDeque[Long] = new LinkedBlockingDeque[Long]()
-  private[algorithm] val leakyBucket: mutable.ListBuffer[Long] = {
-    new mutable.ListBuffer[Long]()
-  }
+class RateLimiter(private val limitSize: Int, private val durationInMs: Long) {
+  private[algorithm] val leakyBucket: ConcurrentLinkedQueue[Long] =
+    new ConcurrentLinkedQueue[Long]()
 
 
   // We store monitonically increasing values:
@@ -27,16 +25,16 @@ class RateLimiter(private val limitSize: Long, private val durationInMs: Long) {
   // Then 7 - 5 = 2, remove all values less than 2
   // We want to remove all values less than that difference.
   private def updateLeakyBucket(timeDiff: Long): Int = {
-    if (leakyBucket.nonEmpty && leakyBucket.head < timeDiff) {
-      val removeSize = leakyBucket.takeWhile(_ < timeDiff).size
-      leakyBucket.remove(0, removeSize - 1)
+
+    if (!leakyBucket.isEmpty && leakyBucket.peek() < timeDiff) {
+      leakyBucket.removeIf(_ < timeDiff)
     }
 
     leakyBucket.size
   }
 
   /**
-   * TODO: Figure out how we would model returnign both RateLimiter and Response
+   * TODO: Figure out how I would do this for real.
    * @param time
    * @return
    */
@@ -45,7 +43,7 @@ class RateLimiter(private val limitSize: Long, private val durationInMs: Long) {
     val size = updateLeakyBucket(limitDiff)
 
     if (size <= limitSize)
-      leakyBucket.append(time)
+      leakyBucket.add(time)
       this
     else {
       this
@@ -61,8 +59,12 @@ class RateLimiter(private val limitSize: Long, private val durationInMs: Long) {
   }
 }
 
+/**
+ * TODO: I would actually like the ability
+ * to define a given to summon a rate Limiter. Or some default one.
+ */
 object RateLimiter {
-  def apply(limitSize: Long, durationInMs: Long): RateLimiter = {
+  def apply(limitSize: Int, durationInMs: Long): RateLimiter = {
     new RateLimiter(limitSize, durationInMs)
   }
 

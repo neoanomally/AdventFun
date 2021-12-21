@@ -20,6 +20,7 @@ about as I go through Advent of Code 2021:I am using this as a
 sbt test
 ```
 
+TODO: Maybe make this more generic instead of a main per... But the mains where I've been storing the problem statements. 
 ## Running the various Days:
 1. Day One:       `sbt "runMain com.sandersme.advent.SonarSweep"`
 2. Day Two:       `sbt "runMain com.sandersme.advent.Dive"`
