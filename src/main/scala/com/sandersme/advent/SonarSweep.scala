@@ -1,5 +1,6 @@
 package com.sandersme.advent
 
+import com.sandersme.advent.algorithm.LimitQueue
 import com.sandersme.advent.model.Accumulator.calculateIncreases
 import com.sandersme.advent.model.{SingleAccumulator, SlidingWindowAccumulator}
 

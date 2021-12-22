@@ -16,6 +16,7 @@ case class BinaryCoding(bits: List[Bit]) {
 }
 
 object BinaryCoding {
+
   def apply(input: String): BinaryCoding = {
     val bits = Bits.parseBinary(input)
     BinaryCoding(bits.toList)

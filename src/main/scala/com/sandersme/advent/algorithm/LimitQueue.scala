@@ -1,4 +1,6 @@
-package com.sandersme.advent
+package com.sandersme.advent.algorithm
+
+import com.sandersme.advent.algorithm.LimitQueue
 
 import scala.collection.mutable
 

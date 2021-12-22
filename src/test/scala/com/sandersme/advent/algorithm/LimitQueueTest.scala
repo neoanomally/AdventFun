@@ -1,4 +1,4 @@
-package com.sandersme.advent
+package com.sandersme.advent.algorithm
 
 import munit.FunSuite
 

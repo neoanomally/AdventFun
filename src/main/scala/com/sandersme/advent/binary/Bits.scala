@@ -3,6 +3,8 @@ package com.sandersme.advent.binary
 import com.sandersme.advent.binary.{Bit, One, Zero}
 
 
+type Bits = Vector[Bit]
+
 object Bits {
   lazy val HEX_BITS_MAP: Map[Char, Vector[Bit]] = Map(
     '0' -> Vector(Zero, Zero, Zero, Zero),
@@ -20,7 +22,7 @@ object Bits {
     'C' -> Vector(One, One, Zero, Zero),
     'D' -> Vector(One, One, Zero, One),
     'E' -> Vector(One, One, One, Zero),
-    'F' -> Vector(One, Zero, Zero, Zero)
+    'F' -> Vector(One, One, One, One)
   )
 
   lazy val BITS_HEX_MAP: Map[Vector[Bit], Char] = HEX_BITS_MAP.map(_.swap)
@@ -34,6 +36,14 @@ object Bits {
     bits
   }
 
+  /**
+   *
+   * @param input values should be 0 -> F in Hex
+   * @return 4 bits representing the hex in binary
+   *         TODO For real life this is going to potentially
+   *         have some failures, we'd need to be able to handle input
+   *         failure cases.
+   */
   def parseHex(input: String): Vector[Bit] = {
     input.flatMap(HEX_BITS_MAP).toVector
   }
