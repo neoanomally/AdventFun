@@ -1,6 +1,7 @@
 package com.sandersme.advent.algorithm
 
-import com.sandersme.advent.algorithm.RateLimiter.Response._
+import com.sandersme.advent.model.Response
+import com.sandersme.advent.model.Response._
 
 class RateLimiterTest extends munit.FunSuite {
 
@@ -9,7 +10,7 @@ class RateLimiterTest extends munit.FunSuite {
     def startTime  = 1000000L
 
     // the first 10 values should pass, then the next 10 fail, then next 10 pass, then rest fail
-    val results = (0 to 33).foldLeft(List.empty[RateLimiter.Response]) { (accum, i) =>
+    val results = (0 to 33).foldLeft(List.empty[Response]) { (accum, i) =>
       val time: Long = if (i < 20) {
         startTime
       } else if( i <= 31) {
@@ -17,14 +18,26 @@ class RateLimiterTest extends munit.FunSuite {
       } else {
         startTime + 400000L
       }
-      val limiter = RateLimiter.shouldLimit(rateLimiter, time)
+      val shouldLimit = rateLimiter.shouldAllow(time)
 
-      accum :+ limiter._2
+      accum :+ shouldLimit
     }
 
     val expected = List(PASS, PASS, PASS, PASS, PASS, PASS, PASS, PASS, PASS, PASS, FAIL, FAIL, FAIL, FAIL, FAIL, FAIL,
       FAIL, FAIL, FAIL, FAIL, PASS, PASS, PASS, PASS, PASS, PASS, PASS, PASS, PASS, PASS, FAIL, FAIL, PASS, PASS)
     assertEquals(results, expected)
+  }
+
+  test("Let me manually Test some stuff".ignore) {
+    val limiter = RateLimiter(5, 1000)
+
+    val accumulator: List[Response] = (1 to 50).foldLeft(List.empty[Response]){(accum, _) =>
+      val updatedAccum = accum :+ limiter.shouldAllow(System.currentTimeMillis())
+      Thread.sleep(50)
+      updatedAccum
+    }
+
+    println(accumulator)
   }
 
 }

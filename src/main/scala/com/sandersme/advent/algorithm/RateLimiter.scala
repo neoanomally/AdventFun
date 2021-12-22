@@ -1,13 +1,12 @@
 package com.sandersme.advent.algorithm
 
-import com.sandersme.advent.algorithm.RateLimiter.Response
-import org.scalacheck.Test.Failed
+import com.sandersme.advent.algorithm.RateLimiter
+import com.sandersme.advent.model.Response
+import com.sandersme.advent.model.Response
 
-import scala.annotation.tailrec
 import scala.collection.mutable
 import java.util.Collections
 import java.util.concurrent.{ConcurrentLinkedQueue, LinkedBlockingDeque}
-import scala.concurrent.duration.Duration
 
 /**
  * TODO Look at actual algorithms.
@@ -19,7 +18,7 @@ class RateLimiter(private val limitSize: Int, private val durationInMs: Long) {
     new ConcurrentLinkedQueue[Long]()
 
 
-  // We store monitonically increasing values:
+  // We store monotonically increasing values:
   // 1, 2, 3, 3, 3, 4, 5
   // timeDiff will be newValue - Difference so if the diff is 5 and the new value is 7
   // Then 7 - 5 = 2, remove all values less than 2
@@ -38,20 +37,12 @@ class RateLimiter(private val limitSize: Int, private val durationInMs: Long) {
    * @param time
    * @return
    */
-  def limit(time: Long): RateLimiter = synchronized {
+  def shouldAllow(time: Long): Response = this.synchronized {
     val limitDiff = time - durationInMs
     val size = updateLeakyBucket(limitDiff)
 
-    if (size <= limitSize)
+    if (size < limitSize) {
       leakyBucket.add(time)
-      this
-    else {
-      this
-    }
-  }
-
-  private[algorithm] def shouldAllow: Response = {
-    if (leakyBucket.size.toLong <= limitSize) {
       Response.PASS
     } else {
       Response.FAIL
@@ -68,11 +59,7 @@ object RateLimiter {
     new RateLimiter(limitSize, durationInMs)
   }
 
-  enum Response {
-    case PASS, FAIL, EMPTY
-  }
-
-  def shouldLimit(rateLimiter: RateLimiter, time: Long): (RateLimiter, Response) = {
-    (rateLimiter.limit(time), rateLimiter.shouldAllow)
-  }
+  // TODO: Instead of returning a ratelimiter itself. It might be useful
+  // To amake a function that returns a function that returns either the
+  // value or an error based on ratelimiter.
 }
