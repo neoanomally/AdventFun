@@ -1,6 +1,8 @@
-package com.sandersme.advent.model
+package com.sandersme.advent.binary
 
-import com.sandersme.advent.model.BinaryCoding.{One, Zero}
+import com.sandersme.advent.binary.{BinaryCoding, BitTypeCounter}
+import com.sandersme.advent.model.Diagnostics
+import com.sandersme.advent.binary.Bit
 
 class BitTypeCountersTest extends munit.FunSuite {
 

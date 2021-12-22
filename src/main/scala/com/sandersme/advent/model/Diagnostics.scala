@@ -1,8 +1,7 @@
 package com.sandersme.advent.model
 
-import com.sandersme.advent.model.BinaryCoding
-import com.sandersme.advent.model.BinaryCoding._
-import com.sandersme.advent.model.BitTypeCounter
+import com.sandersme.advent.binary.{BinaryCoding, BitTypeCounter}
+import com.sandersme.advent.binary.{Bit, Zero, One}
 
 class Diagnostics(binaryCodings: List[BinaryCoding]){
   // Calculates the binary length of the BinaryCoding

@@ -1,9 +1,8 @@
 package com.sandersme.advent
 
-import com.sandersme.advent.model.BinaryCoding
-import com.sandersme.advent.model.BinaryCoding._
+import com.sandersme.advent.binary.BinaryCoding
 import com.sandersme.advent.model.Diagnostics
-import com.sandersme.advent.model.Diagnostics._
+import com.sandersme.advent.model.Diagnostics.*
 
 object BinaryDiagnostic {
   /**

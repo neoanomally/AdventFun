@@ -1,8 +1,10 @@
-package com.sandersme.advent.model
+package com.sandersme.advent.binary
+
 
 /**
  * The BitTypeCounter is a counter that's useful for claculating diagnostics report. They are good
  * at summing up multiple binaries related to diagnostics reports.
+ *
  * @param zeroCount
  * @param oneCount
  */

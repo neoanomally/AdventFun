@@ -1,8 +1,7 @@
-package com.sandersme.advent.model
+package com.sandersme.advent.binary
 
-import com.sandersme.advent.model.BinaryCoding.*
+import com.sandersme.advent.binary.*
 import com.sandersme.advent.model.Diagnostics.*
-import com.sandersme.advent.model.{BinaryCoding, BitTypeCounter}
 
 class BinaryDiagnosticTest extends munit.FunSuite {
   val TEST_INPUT = List(

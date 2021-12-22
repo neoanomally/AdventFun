@@ -1,7 +1,6 @@
-package com.sandersme.advent.model
+package com.sandersme.advent.binary
 
-import BinaryCoding._
-import com.sandersme.advent.model.BitTypeCounter
+import com.sandersme.advent.binary.{Bit, Bits}
 
 case class BinaryCoding(bits: List[Bit]) {
   override def toString: String = {
@@ -17,15 +16,8 @@ case class BinaryCoding(bits: List[Bit]) {
 }
 
 object BinaryCoding {
-  sealed trait Bit
-  object One extends Bit
-  object Zero extends Bit
-
-
   def apply(input: String): BinaryCoding = {
-    val bits = input.toList
-      .map(value => if(value == '1') One else Zero)
-
+    val bits = Bits.parseBinary(input)
     BinaryCoding(bits)
   }
 

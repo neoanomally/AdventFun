@@ -1,6 +1,6 @@
 package com.sandersme.advent.model
 
-import com.sandersme.advent.model.BinaryCoding.{One, Zero}
+import com.sandersme.advent.binary._
 
 class DiagnosticsTest extends munit.FunSuite {
   val TEST_INPUT = List(
