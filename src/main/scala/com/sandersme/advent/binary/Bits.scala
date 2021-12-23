@@ -6,6 +6,20 @@ import com.sandersme.advent.binary.{Bit, One, Zero}
 type Bits = Vector[Bit]
 
 object Bits {
+  case class Accum(total: Int = 0, index: Int = 0)
+
+  def toInt(bits: Bits): Int = {
+    bits.foldRight(Accum()){ case (bit, accum) =>
+        val updatedIndex = accum.index + 1
+        bit match {
+          case Zero => accum.copy(index = updatedIndex)
+          case One =>
+            val updatedTotal: Int = Math.pow(2, accum.index).toInt + accum.total
+            accum.copy(total = updatedTotal, index = updatedIndex)
+        }
+      }.total
+  }
+
   lazy val HEX_BITS_MAP: Map[Char, Vector[Bit]] = Map(
     '0' -> Vector(Zero, Zero, Zero, Zero),
     '1' -> Vector(Zero, Zero, Zero, One),
@@ -27,8 +41,6 @@ object Bits {
 
   lazy val BITS_HEX_MAP: Map[Vector[Bit], Char] = HEX_BITS_MAP.map(_.swap)
 
-
-
   def parseBinary(input: String): Vector[Bit] = {
     val bits: Vector[Bit] = input
       .map(value => if(value == '1') One else Zero)
@@ -44,7 +56,7 @@ object Bits {
    *         have some failures, we'd need to be able to handle input
    *         failure cases.
    */
-  def parseHex(input: String): Vector[Bit] = {
+  def parseHex(input: String): Bits = {
     input.flatMap(HEX_BITS_MAP).toVector
   }
 

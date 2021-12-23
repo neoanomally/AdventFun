@@ -1,5 +1,7 @@
 package com.sandersme.advent
 
+import com.sandersme.advent.packet.Packet
+
 object PacketDecoder {
 
   /**
@@ -101,8 +103,10 @@ object PacketDecoder {
    */
   def main(args: Array[String]): Unit = {
     val inputData = Input.readFromDataResource("day16_input")
+    val packets = Packet.fromHex(inputData.head)
+    val sumOfVersions = Packet.calculateVersionSum(packets)
 
-
+    println(s"Reading in the large packet, the total of their version headers are: $sumOfVersions")
   }
 
 }
