@@ -133,10 +133,7 @@ object PacketDecoder {
     val totalFinalVal = Packet.calculateFinalValue(packets)
 
     println(s"Reading in the large packet, the total of their version headers are: $sumOfVersions")
-
     println(s"The total value of this large packet is ${totalFinalVal}")
-
-
 
     Packet.printPacketHierarchy(packets)
   }
