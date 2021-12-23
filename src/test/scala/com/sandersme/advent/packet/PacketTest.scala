@@ -51,7 +51,7 @@ class PacketTest extends munit.FunSuite {
 
     assertEquals(input.size, 42)
 
-    val results: List[Packet] = Packet.readPackets(input)
+    val (results: List[Packet], _) = Packet.readPackets(input)
 
     // May drop the last right one only for LiteralPacket, but we'll see
     val expectedBodyA = Vector(Zero, One, Zero, Zero, One, One, One, One, One, Zero, One, One)
@@ -67,8 +67,8 @@ class PacketTest extends munit.FunSuite {
 
     assertEquals(packets.head.packets.size, 3)
 
-    val literalPacketResults = packets.head.packets.map(_.toInt)
-    val expectedLiteralValueResults = List(1, 2, 3)
+    val literalPacketResults = packets.head.packets.map(_.value)
+    val expectedLiteralValueResults = List(BigInt(1), BigInt(2), BigInt(3))
     assertEquals(literalPacketResults, expectedLiteralValueResults)
   }
 
@@ -84,7 +84,7 @@ class PacketTest extends munit.FunSuite {
     val packets = Packet.fromHex("C0015000016115A2E0802F182340")
     val results = Packet.calculateVersionSum(packets)
 
-    assertEquals(results, 12)
+    assertEquals(results, 23)
   }
 
   test("Another larger that has 5 literal values a sum of 31") {
@@ -94,9 +94,72 @@ class PacketTest extends munit.FunSuite {
     assertEquals(results, 31)
   }
 
+  //  represents an operator packet (version 3) which contains two sub-packets; each sub-packet is an operator packet
+  //  that contains two literal values. This packet has a version sum of 12.
   test("Packet containing two sub packets") {
     val packets = Packet.fromHex("620080001611562C8802118E34")
     val results = Packet.calculateVersionSum(packets)
-    assertEquals(results, 23)
+    assertEquals(results, 12)
+  }
+
+  test("Packet containing C200B40A82 should find the sum of 1 & 2 returning 3") {
+    val packets = Packet.fromHex("C200B40A82")
+    val totalValue = Packet.calculateFinalValue(packets)
+
+    assertEquals(totalValue, BigInt(3))
+  }
+
+  test("Packet with hex 04005AC33890 should find the product of 6 and 9 returning 54") {
+    val packets = Packet.fromHex("04005AC33890")
+    val totalValue = Packet.calculateFinalValue(packets)
+
+    assertEquals(totalValue, BigInt(54))
+  }
+
+  test("Packet with 880086C3E88112 should find the minimum of 7, 8, 9 returning 7") {
+    val packets = Packet.fromHex("880086C3E88112")
+    val totalValue = Packet.calculateFinalValue(packets)
+
+    assertEquals(totalValue, BigInt(7))
+  }
+
+
+  test("Packet with hex CE00C43D881120 should find the maximum of 7, 8, 9 returning 9") {
+    val packets = Packet.fromHex("CE00C43D881120")
+    val totalValue = Packet.calculateFinalValue(packets)
+
+    assertEquals(totalValue, BigInt(9))
+  }
+
+
+  test("Packet with hex D8005AC2A8F0 should result in 1 because left is greater than right") {
+    val packets = Packet.fromHex("D8005AC2A8F0")
+    val totalValue = Packet.calculateFinalValue(packets)
+
+    assertEquals(totalValue, BigInt(1))
+  }
+
+
+  test("Packet with hex F600BC2D8F should be 0 Since the result isn't greater than") {
+    val packets = Packet.fromHex("F600BC2D8F")
+    val totalValue = Packet.calculateFinalValue(packets)
+
+    assertEquals(totalValue, BigInt(0))
+  }
+
+
+  test("Packet with hex 9C005AC2F8F0 should find 0 because sub results aren't equal") {
+    val packets = Packet.fromHex("9C005AC2F8F0")
+    val totalValue = Packet.calculateFinalValue(packets)
+
+    assertEquals(totalValue, BigInt(0))
+  }
+
+
+  test("Packet with hex {9C0141080250320F1802104A08} complex packet") {
+    val packets = Packet.fromHex("9C0141080250320F1802104A08")
+    val totalValue = Packet.calculateFinalValue(packets)
+
+    assertEquals(totalValue, BigInt(1))
   }
 }

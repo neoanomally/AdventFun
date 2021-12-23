@@ -17,9 +17,12 @@ case class LiteralPacket(override val version: Version,
                          override val body: Body) extends Packet {
 
 
-  override def toInt: Int = {
-    Bits.toInt(body.nibbles.flatMap(_.bits))
+  override def value: BigInt = {
+    Bits.toBigInt(body.nibbles.flatMap(_.bits))
   }
+
+  override def toString: String = s"Value: ${value}"
+
 }
 
 object LiteralPacket {

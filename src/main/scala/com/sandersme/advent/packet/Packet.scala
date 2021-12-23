@@ -5,14 +5,29 @@ import com.sandersme.advent.packet.{Packet, Version}
 
 import scala.annotation.tailrec
 
+
+/**
+ * Two known subclasses of the Packet are [[OperatorPacket]] and [[LiteralPacket]]
+ *
+ * These are the common interfaces shared by each subclass.
+ * Each packet has a [[Version]] and [[PType]] Headers. Some packets may themselves have children.
+ * This defaults the children packets to empty lists. Some vectors have a Body, and this defaults it
+ * to empty.
+ *
+ * The value method is probably a bad name, but this is just a numerical representation of the packet and
+ * it's subpackets.
+ *
+ * TODO: Note to self this was a missed opportunity to use Unions and Intersection types :shrug:
+ */
 trait Packet {
   val version: Version
   val ptype: PType
 
   def packets: List[Packet] = List.empty
-  def toInt: Int = Bits.toInt(ptype.value)
   def body: Body = Body(Vector.empty)
   def versionNum: Int = Bits.toInt(version.bits)
+
+  def value: BigInt
 }
 
 object Packet {
@@ -32,27 +47,46 @@ object Packet {
   private[packet] def readPacketType(bits: Bits): PType = PType(bits.slice(3, 6))
 
   /**
-   * TODO: We actually need a way to recursively read all the packets
-   * So what we'll need to do is return tuples Packets and Remaining Bits
+   * Because [[Packet]] may have children [[Packets]] this method is used to take in bits as well as
+   * an accumulator of packets. When we have enough bits to render a packet (bits.size > 6)
+   *
+   * Both [[OperatorPacket]] and [[LiteralPacket]] have [[Version]] and [[PType]]
+   * values. Those are read first and are always the first six bytes of the packet.
+   *
+   * Then if the [[PType]] has a value of FOUR, these are Literal packets made up of nibbles.
+   * Version four packets may have multiple [[LiteralPacket]]. We won't know how many ahead
+   * of time since and rely on sliding across the packets in chunks of 5. Once we get to a
+   * Chunk that starts with a 0 it indicates that [[LiteralPacket]] is complete.
+   * See [[LiteralPacket.readAllNibbles]] for more information.
+   *
+   * Any other [[PType]] indicates an [[OperatorPacket]] which has it's own way of determining
+   * how many packets to read and return. See [[Packet.parseOperatorPackets]] for more information
+   *
+   * We will return 0...N remaining bits. The remaining bits will only from from Operator packets
+   * Because this is a recursive function we need to return remaining bits as well as the children packets collected.
    * */
-//  @tailrec
-  private[packet] def readPackets(bits: Bits, packets: List[Packet] = List.empty): List[Packet] = {
-   if (bits.isEmpty || bits.size <= 6)
-     packets
-   else {
+  private[packet] def readPackets(bits: Bits,
+                                  packets: List[Packet] = List.empty,
+                                  packetsToRead: Int = Int.MaxValue): (List[Packet], Bits) = {
+   if (bits.isEmpty || bits.size <= 6 || packetsToRead <= 0) {
+     val bitsRemoveTrailing = if (bits.size <= 6) Bits.empty else bits
+     (packets, bits)
+   } else {
      val version = readVersion(bits)
      val pType = readPacketType(bits)
      val bitsAfterHeader = bits.drop(6)
 
-     pType match {
+     pType.value match {
        // TODO: Move each of these to their own functions
-       case PType.TYPE_FOUR =>
+       case 4 =>
          val (nibbles: Nibbles, remainingBits) = LiteralPacket.readAllNibbles(bitsAfterHeader)
-         val literalPacket = LiteralPacket(version, pType, Body(nibbles))
-         readPackets(remainingBits, packets :+ literalPacket)
+         val literalPacket: LiteralPacket = LiteralPacket(version, pType, Body(nibbles))
+         val (literalPackets, otherRemainingBits) = readPackets(remainingBits, packets :+ literalPacket, packetsToRead - 1)
+         (literalPackets, otherRemainingBits)
        case _ => // OperatorPacket
          val (remainingBits, operatorPacket) = parseOperatorPackets(bitsAfterHeader, version, pType)
-         readPackets(remainingBits, packets :+ operatorPacket)
+         val (operatorPackets, otherRemainingBits) = readPackets(remainingBits, packets :+ operatorPacket, packetsToRead - 1)
+         (operatorPackets, otherRemainingBits)
      }
    }
   }
@@ -62,32 +96,35 @@ object Packet {
    * If we have a Zero we read 15 bits and this represents the number of bits to read through
    * If we have a One it represents the number of subpackets that this will contain.
    *
-   * @param bits
-   * @param version
-   * @param pType
+   * The other thing worth noting is that the operatorVersion does impact whether or not we use remaining
+   * bits to create more subpackets. That's because it assumes we are only reading {x} [[Bit]] from
+   * the input bits. For case One the method just reads that many packets.
+   *
+   * @param bits input List of [[Bit]] aliased to [[Bits]]
+   * @param version [[Version]] of the incoming parent [[Packet]] that will be constructed
+   * @param pType [[PType]] of the incoming parent [[Packet]] that will be constructed
    * @return
    */
   private[packet] def parseOperatorPackets(bits: Bits, version: Version,
                                            pType: PType): (Bits, OperatorPacket) = {
     val operatorVersion = bits.head
 
-    val  packets = operatorVersion match {
+    val  (packets: List[Packet], remainingBits: Bits) = operatorVersion match {
       case Zero =>
         val numBitsToRead: Int = Bits.toInt(bits.slice(1, 16))
         val otherBits: Bits =  bits.drop(16)
         val packetBits: Bits = otherBits.take(numBitsToRead)
-        val remainingBits: Bits = otherBits.drop(numBitsToRead) // TODO: Do we need these remaining bits?
-        readPackets(packetBits)
+        val remainingBits: Bits = otherBits.drop(numBitsToRead)
+        val (packetsFromBits, _) = readPackets(packetBits)
+        (packetsFromBits, remainingBits)
       case One =>
-        val numberOfBits = bits.slice(1, 12)
+        val numPacketsToRead: Int = Bits.toInt(bits.slice(1, 12))
         val otherBits = bits.drop(12)
-        readPackets(otherBits)
+        readPackets(otherBits, packetsToRead = numPacketsToRead)
     }
 
-
     val operatorPacket = OperatorPacket(version, pType, Vector.empty, packets)
-    // TODO: FOR NOW RETURNING EMPTY VECTOR DO WE NEED THE BITS FROM ABOVE?
-    (Vector.empty, operatorPacket)
+    (remainingBits, operatorPacket)
   }
 
   /**
@@ -125,9 +162,18 @@ object Packet {
   def fromHex(input: String): List[Packet] = {
     val bitsFromHex: Bits = Bits.parseHex(input)
 
-    readPackets(bitsFromHex)
+    val (packets, _) = readPackets(bitsFromHex)
+    packets
   }
 
+  /**
+   * Go through each packet and find the subchildren of the packets. For each sub child add
+   * the version of the packet to the accumulator. By the time this method finds all
+   * sub children we have the sum of all the [[Version]] headers.
+   * @param packets List of [[Packet]]. The root packet should just be one packet with sub packets
+   * @param versionAccum This is a simple [[Int]] that accumulates values. This is only good to the upper bounds of Int
+   * @return Sum of all [[Packet]] children [[Version]] Headers
+   */
   @tailrec
   def calculateVersionSum(packets: List[Packet], versionAccum: Int = 0): Int = {
     val updatedVersionAccum = packets.map(_.versionNum).sum + versionAccum
@@ -140,4 +186,38 @@ object Packet {
     }
   }
 
+  /**
+   * To calculate the final value of the packet this will rely on the methods in [[LiteralPacket]]
+   * and [[OperatorPacket]] that share the [[Packet.value]]... For the Operator packet it may
+   * have subpackets that also need to be called. These are essentailly an acyclic graph/Tree of operations
+   * SO there should be no cycles. The leaves of the tree should all be literal values.
+   *
+   * So at each [[OperatorPacket]] in the graph we should finally get to a place where we have children that
+   * are [[LiteralPacket]] that can have one of many operations in the [[OperatorPacket.value]] method.
+   *
+   * So the call below where we map the input packet to value will recurse through all the children's values
+   * This is not tailrec optimized, but should be no problem on small trees.
+   * @param packets
+   * @return
+   */
+  def calculateFinalValue(packets: List[Packet]): BigInt = {
+    val cumulativeResult = packets.map(_.value)
+    require(cumulativeResult.size == 1,
+      s"Error the cumulativeResult should return only one value and instead returned ${cumulativeResult.size}")
+
+    cumulativeResult.head
+  }
+
+  def printPacketHierarchy(packets: List[Packet], ident: Int = 0): Unit = {
+    val idention = List.fill(ident)("-").mkString("")
+
+    packets.foreach{ packet =>
+      if (packet.packets.isEmpty) {
+        println(idention + s" ${packet.value}")
+      } else {
+        println(idention + s" ${packet.ptype}")
+        printPacketHierarchy(packet.packets, ident + 1)
+      }
+    }
+  }
 }

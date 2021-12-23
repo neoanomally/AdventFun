@@ -14,10 +14,9 @@ class OperatorPacketTest extends munit.FunSuite {
 
     assertEquals(packet.ptype, expectedPType)
     assertEquals(packet.version, expectedVersion)
-    assertEquals(packet.packets.head.toInt, 10)
-    assertEquals(packet.packets.last.toInt, 20)
+    assertEquals(packet.packets.head.value, BigInt(10))
+    assertEquals(packet.packets.last.value, BigInt(20))
     assertEquals(packet.packets.size, expectedNumberOfPackets)
-
   }
 
 }

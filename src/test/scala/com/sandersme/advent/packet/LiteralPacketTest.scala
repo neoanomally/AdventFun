@@ -8,9 +8,9 @@ class LiteralPacketTest extends munit.FunSuite {
 
   test("Convert a LiteralPacket into an integer with a single nibble") {
     val testPacket = LiteralPacket(Version(Vector(Zero)), PType(Zero), Body(Vector(Nibble(Zero, One, One, Zero))))
-    val intResult = testPacket.toInt
+    val intResult = testPacket.value
 
-    val expectedResult = 6
+    val expectedResult = BigInt(6)
     assertEquals(intResult, expectedResult)
   }
 
@@ -21,9 +21,9 @@ class LiteralPacketTest extends munit.FunSuite {
     val parsedHex = parseHex(inputHex)
     val expectedBinary: Bits = BinaryCoding.apply("011111100101").bits.toVector
     val packet = Packet.fromHex(inputHex)
-    val valueInt = packet.head.toInt
+    val valueInt = packet.head.value
 
-    assertEquals(valueInt, 2021)
+    assertEquals(valueInt, BigInt(2021))
     assertEquals(parsedHex, expectedHexParse)
     assertEquals(packet.head.body.nibbles.flatMap(_.bits), expectedBinary)
   }

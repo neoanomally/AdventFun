@@ -100,13 +100,45 @@ object PacketDecoder {
    * five literal values; it has a version sum of 31. Decode the structure of your
    * hexadecimal-encoded BITS transmission; what do you get if you add up the
    * version numbers in all packets?   * @param args
+   *
+   * * Now that you have the structure of your transmission decoded, you can calculate
+   * the value of the expression it represents.
+   *
+   * Literal values (type ID 4) represent a single number as described above. The
+   * remaining type IDs are more interesting:
+   *
+   * Packets with type ID 0 are sum packets - their value is the sum of the values
+   * of their sub-packets. If they only have a single sub-packet, their value is
+   * the value of the sub-packet. Packets with type ID 1 are product packets -
+   * their value is the result of multiplying together the values of their
+   * sub-packets. If they only have a single sub-packet, their value is the value
+   * of the sub-packet. Packets with type ID 2 are minimum packets - their value
+   * is the minimum of the values of their sub-packets. Packets with type ID 3 are
+   * maximum packets - their value is the maximum of the values of their
+   * sub-packets. Packets with type ID 5 are greater than packets - their value is
+   * 1 if the value of the first sub-packet is greater than the value of the
+   * second sub-packet; otherwise, their value is 0. These packets always have
+   * exactly two sub-packets. Packets with type ID 6 are less than packets - their
+   * value is 1 if the value of the first sub-packet is less than the value of the
+   * second sub-packet; otherwise, their value is 0. These packets always have
+   * exactly two sub-packets. Packets with type ID 7 are equal to packets - their
+   * value is 1 if the value of the first sub-packet is equal to the value of the
+   * second sub-packet; otherwise, their value is 0. These packets always have
+   * exactly two sub-packets.
    */
   def main(args: Array[String]): Unit = {
     val inputData = Input.readFromDataResource("day16_input")
-    val packets = Packet.fromHex(inputData.head)
+    val packets: List[Packet] = Packet.fromHex(inputData.head)
     val sumOfVersions = Packet.calculateVersionSum(packets)
+    val totalFinalVal = Packet.calculateFinalValue(packets)
 
     println(s"Reading in the large packet, the total of their version headers are: $sumOfVersions")
+
+    println(s"The total value of this large packet is ${totalFinalVal}")
+
+
+
+    Packet.printPacketHierarchy(packets)
   }
 
 }
