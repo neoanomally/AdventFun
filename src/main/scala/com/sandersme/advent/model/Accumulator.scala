@@ -16,6 +16,8 @@ object Accumulator {
   }
 }
 
+case class ProbeAccum(inBounds: Boolean = false, x: Int = 0, step: Int = 0)
+
 case class SingleAccumulator(prevVal: Option[Int], increments: Int) extends Accumulator {
   def update(depth: Int): SingleAccumulator = {
     // TODO: Might be nice to clean this up, but these are the three cases. Could use maps
