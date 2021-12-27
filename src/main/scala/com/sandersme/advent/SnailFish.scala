@@ -57,5 +57,11 @@ object SnailFish {
 
     println(s"The magnitude of the snailfish math homework is: ${snailFishMathHomework.magnitude}")
 
+    val combinationsHomework = SnailFishNumber.parseInputPairCombinations(input)
+
+    val maxMagnitudeFromCombos = combinationsHomework.map(_.magnitude).max
+
+    println(s"The max magnitude from the snailfish Math Homework is ${maxMagnitudeFromCombos}")
+
   }
 }

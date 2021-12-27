@@ -264,6 +264,20 @@ object SnailFishNumber {
     finalResult
   }
 
+  def parseInputPairCombinations(input: List[String]): List[SnailFishNumber] = {
+    val listCombinations = for {
+      left <- input
+      right <- input
+
+      if (left != right)
+    } yield List(List(left, right), List(right, left))
+
+    val flatList = listCombinations
+      .flatten
+
+      flatList
+      .map(parseInput)
+  }
 
   /** Any branch from the root tree that is 4 deep should explode. */
   private[model] def willExplodeFromRoot(snailFishNumber: SnailFishNumber): Boolean = {

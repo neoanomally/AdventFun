@@ -247,7 +247,11 @@ class SnailFishNumberTest extends munit.FunSuite {
   }
 
   test("Find highest magnitude by combining all combinations of homework") {
-    ???
+    val maxMagnitude = SnailFishNumber.parseInputPairCombinations(TEST_LARGE_HOMEWORK_ASSIGNMENT)
+      .map(_.magnitude)
+      .max
+
+    assertEquals(maxMagnitude, 3993L)
   }
 
   // Helper method to quickly make test snailfishnumbers.
