@@ -1,5 +1,7 @@
 package com.sandersme.advent
 
+import com.sandersme.advent.model.SnailFishNumber
+
 object SnailFish {
   /**
    * * You descend into the ocean trench and encounter some snailfish. They say they
@@ -48,6 +50,12 @@ object SnailFish {
    */
 
   def main(args: Array[String]): Unit = {
+
+    val input = Input.readFromDataResource("day18_input")
+
+    val snailFishMathHomework = SnailFishNumber.parseInput(input)
+
+    println(s"The magnitude of the snailfish math homework is: ${snailFishMathHomework.magnitude}")
 
   }
 }

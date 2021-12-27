@@ -1,7 +1,5 @@
 package com.sandersme.advent.model
 
-import com.sandersme.advent.model.SnailFishNumber.{bubbleUpValue, recursiveReduce, snailFishNumberAsInt, split, traverseExplodeSplit, tupleToPropogate}
-
 import scala.annotation.tailrec
 
 type SnailFishNumbers = List[SnailFishNumber]
@@ -16,27 +14,12 @@ type SnailFishNumbers = List[SnailFishNumber]
 case class SnailFishNumber(left: Int | SnailFishNumber, right:  Int | SnailFishNumber) {
   override def toString: String = s"($left, $right)"
 
-
-  // TODO We don't actually handle the edge case where the root left and right should be split
-  private[model] def explodeAndSplitRoot: SnailFishNumber = {
-    val shouldReduceLeft = SnailFishNumber
-      .findRootBranchDepth(this)._1 >= 5
-    val shouldReduceRight = !shouldReduceLeft && SnailFishNumber
-      .findRootBranchDepth(this)._2 >= 5
-
-    val (leftReduced, leftBubbled) = SnailFishNumber.traverseExplodeSplit(left, shouldReduceLeft)
-    val (rightReduced, rightBubbled) = SnailFishNumber.traverseExplodeSplit(right, shouldReduceRight)
-
-    /// TODO I think we need to handle the case where left left branch is Int
-    /// ANd the case where right right branch is Int
-    val finalLeft = SnailFishNumber.mergeExploded(leftReduced, rightBubbled._1)
-    val finalRight = SnailFishNumber.mergeExploded(rightReduced, leftBubbled._2)
-
-    SnailFishNumber(finalLeft, finalRight)
+  def magnitude: Long = {
+    SnailFishNumber.calculateMagnitude(this)
   }
 
   def reduce: SnailFishNumber = {
-    recursiveReduce(this)
+    SnailFishNumber.recursiveReduce(this)
   }
 
   /**
@@ -50,11 +33,208 @@ case class SnailFishNumber(left: Int | SnailFishNumber, right:  Int | SnailFishN
    * @return
    */
   private[model] def willReduce: Boolean = {
-    SnailFishNumber.willExplode(this) || SnailFishNumber.willSplit(this)
+    SnailFishNumber.willExplodeFromRoot(this) || SnailFishNumber.willSplit(this)
   }
 }
 
 object SnailFishNumber {
+
+  /**
+   *  The magnitude of a pair is 3 times the magnitude of its left element plus 2 times the magnitude of its right
+   *  element. The magnitude of a regular number is just that number.
+   * @param snailFishNumber
+   * @return
+   */
+  private[model] def calculateMagnitude(snailFishNumber: SnailFishNumber | Int): Long = {
+    snailFishNumber match {
+      case i: Int => i.toLong
+      case sfn: SnailFishNumber =>
+        (3L * calculateMagnitude(sfn.left)) + (2L * calculateMagnitude(sfn.right))
+    }
+  }
+
+
+  /**
+   * This is a nice helper function. Since the Container object can either be a SnailFishNumber
+   * or an Int with a union type this just converts it to the final class that we expect.
+   *
+   * @param snailFishNumber
+   * @return
+   */
+  private[model] def explode(snailFishNumber: SnailFishNumber): SnailFishNumber = {
+    val explodedSnailFish = ExplodedSnailFish(snailFishNumber)
+    explodeSnailFish(explodedSnailFish).snailFishNumber match {
+      case sfn: SnailFishNumber => sfn
+      case _ => throw new Exception("Should not get here. This method should only be called from the root.")
+    }
+  }
+
+  /**
+   * This class is what we use to carry state throughout the tree. We are using immutable datastructures,
+   * so in order to know what and when to update different portions of the tree we need to know
+   * if we should explod, have we exploded and if we do explode how much should be applied left
+   * and right of the branch the explosion happens.
+   *
+   * This contianer was created due to the amount of information that we needed to carry
+   * with us throughout the traversal. It was easier to throw more data into this
+   * container to pass across all the function calls.
+   */
+  private[model] case class ExplodedSnailFish(snailFishNumber: SnailFishNumber | Int,
+                                              shouldExplode: Boolean = true, hasExploded: Boolean = false,
+                                              leftValue: Int = 0, rightValue: Int = 0)
+  enum Branch {
+    case Left, Right, None
+  }
+
+  /**
+   * V2 of trying to go left to right using recursion to explode and update values
+   * throughout the tree Structure. The hard part that I'm having to wrap my mind around
+   * is updating left to right and then making sure things that are updated
+   * from the right propogate back to the left without infinite recursion: This is the longest I would ever
+   * allow a function
+   *
+   *
+   * @param exploded This is an accumulator case class that we are using to propogate lots of parameters
+   * @param step
+   * @param valueToAdd
+   * @return
+   */
+  private[model] def explodeSnailFish(exploded: ExplodedSnailFish,
+                                      step: Int = 1,
+                                      branch: Branch = Branch.None): ExplodedSnailFish = {
+    if (step == 5 && exploded.shouldExplode) {
+      exploded.snailFishNumber match {
+        case i: Int               => exploded
+        case sfn: SnailFishNumber =>
+          ExplodedSnailFish(0, false, true, snailFishToInt(sfn.left), snailFishToInt(sfn.right))
+      }
+    } else if (exploded.shouldExplode) {
+      exploded.snailFishNumber match {
+        case i: Int         => exploded
+        case sfn: SnailFishNumber =>
+          val isExplodeLeft = SnailFishNumber.willExplode(sfn.left, step + 1)
+
+          if (isExplodeLeft) {
+            val leftExploded =  explodeSnailFish(exploded.copy(sfn.left), step + 1)
+            val pushRight = explodeSnailFish(leftExploded.copy(sfn.right), step + 1, Branch.Right) // HasExploded
+
+            pushRight.copy(
+              snailFishNumber = SnailFishNumber(leftExploded.snailFishNumber, pushRight.snailFishNumber))
+          } else {
+            val rightExploded = explodeSnailFish(exploded.copy(sfn.right), step + 1)
+            val pushLeft = explodeSnailFish(rightExploded.copy(sfn.left), step + 1, Branch.Left)
+
+            pushLeft.copy(
+              snailFishNumber = SnailFishNumber(pushLeft.snailFishNumber, rightExploded.snailFishNumber))
+          }
+      }
+    } else { // This is the case where it hasExploded.
+      processHasExploded(exploded, step, branch)
+    }
+  }
+
+  /**
+   * This is to break out the functionality from above into it's own function. This *COULD* be tested
+   * independentally, but I'm not going to. This method assumes that the explosion has occurred.
+   * The State of the Explosion is propagated through the ExploredSnailFish class...
+   * This class was mostly created due to how much information we need to propogate information left and
+   * right. The branching strategy tells us which values we need to use and zero out. The state
+   * needs to propogate throughout the tree until it is applied to one of the branches.
+   *
+   * This does not mutate any of the fish instead it updates each fish state with the previous object
+   * passing along the new object the whole time. This does complicate things and sometimes state would probably be better
+   *
+   * @param exploded: This is a container for the state of how much and which branches to add values to
+   * @param step Step is kind of a misnomer I propogated it throughout the codebase but it means depth.
+   * @param branch WHich branch we need to apply. For example if we know that the snailfish to our right exploded
+   *               we want to tell the branches to the left to apply the left state.
+   * @return  A new copy of the exploded snailfish state which includes the new immutable SnailFishNumber
+   *          at a specific branch. How much we apply to left and right branch.
+   */
+  private[model] def processHasExploded(exploded: ExplodedSnailFish, step: Int, branch: Branch): ExplodedSnailFish = {
+    branch match {
+      case Branch.Left =>
+        exploded.snailFishNumber match
+          case i: Int => exploded.copy(snailFishNumber = i + exploded.leftValue, leftValue = 0)
+          case sfn: SnailFishNumber =>
+            val right = explodeSnailFish(exploded.copy(sfn.right), step + 1, branch)
+            val left = explodeSnailFish(right.copy(sfn.left), step + 1, branch)
+
+            left.copy(snailFishNumber = SnailFishNumber(left.snailFishNumber, right.snailFishNumber))
+
+      case Branch.Right =>
+        exploded.snailFishNumber match
+          case i: Int => exploded.copy(snailFishNumber = i + exploded.rightValue, rightValue = 0)
+          case sfn: SnailFishNumber =>
+            val left = explodeSnailFish(exploded.copy(sfn.left), step + 1, branch)
+            val right = explodeSnailFish(left.copy(sfn.right), step + 1, branch)
+
+            right.copy(snailFishNumber = SnailFishNumber(left.snailFishNumber, right.snailFishNumber))
+      case Branch.None =>
+        throw new Exception("Fatal Error, we should never enter this branch troubleshooting")
+    }
+  }
+
+  private[model] def willExplode(snailFishNumber: SnailFishNumber | Int, depth: Int): Boolean = {
+    snailFishNumber match {
+      case i: Int => depth >= 6
+      case snailFishNumber: SnailFishNumber =>
+        willExplode(snailFishNumber.left, depth + 1) || willExplode(snailFishNumber.right, depth + 1)
+    }
+  }
+
+
+  /**
+   * The following is syntactic sugar for the following two functions. One of them does a recursion
+   * splitting out the left most node.
+   *
+   * @param snailFishNumber: SHould be the root node in the branch.
+   * @return New Root Node. Todo MOve this function to the case class
+   */
+  def split(snailFishNumber: SnailFishNumber | Int): SnailFishNumber = {
+    splitSnailFish(snailFishNumber)._1 match {
+      case sfn: SnailFishNumber => sfn
+      case _ => throw new Exception("This should only be called from the root. Should not get here.")
+    }
+  }
+
+  /** recurse through the function and look for values that may need to split. This step should only happen
+   * after there are no explosions. only the firstMost should split
+   * This always goes from left to right and only does one split at a time.
+   * */
+  private[model] def splitSnailFish(snailFishNumber: SnailFishNumber | Int,
+                     shouldSplit: Boolean = true): (SnailFishNumber | Int, Boolean) = {
+    if (shouldSplit) {
+      snailFishNumber match {
+        case i: Int =>
+          if (i >= 10)
+            (splitNumber(i), false) // This is the exit condition that sets all right nodes to know no splitting should happen
+          else
+            (i, shouldSplit)
+        case sfn: SnailFishNumber =>
+          val (left, continueSplitLeft) = splitSnailFish(sfn.left, shouldSplit)
+          val (right, continueSplitRight) = splitSnailFish(sfn.right, continueSplitLeft)
+
+          (SnailFishNumber(left, right), continueSplitRight)
+      }
+    } else { // Quickly just exit with the original number since we should split at most one per split
+      (snailFishNumber, shouldSplit)
+    }
+  }
+
+  /**
+   * the left element of the pair should be the regular number divided by two and rounded down, while the right element
+   * of the pair should be the regular number divided by two and rounded up. For example, 10 becomes [5,5], 11 becomes
+   * [5,6], 12 becomes [6,6], and so on.
+   * @param i input value that needs to be split.
+   * @return SnailValue of the new split.
+   */
+  private[model] def splitNumber(i: Int): SnailFishNumber = {
+    val left  = Math.floor(i / 2.0).toInt
+    val right = Math.ceil(i / 2.0).toInt
+
+    SnailFishNumber(left, right)
+  }
 
   /**
    * This will continue to reduce until we have reduced as much as possible.
@@ -64,12 +244,11 @@ object SnailFishNumber {
    */
   @tailrec
   def recursiveReduce(snailFishNumber: SnailFishNumber): SnailFishNumber = {
-    if (snailFishNumber.willReduce) {
-      println(s"Reducing: $snailFishNumber")
-      recursiveReduce(snailFishNumber.explodeAndSplitRoot)
+    if (SnailFishNumber.willExplode(snailFishNumber, 1)) {
+      recursiveReduce(SnailFishNumber.explode(snailFishNumber))
+    } else if (SnailFishNumber.willSplit(snailFishNumber)) {
+      recursiveReduce(SnailFishNumber.split(snailFishNumber))
     } else {
-
-      println(s"Final: $snailFishNumber")
       snailFishNumber
     }
   }
@@ -79,7 +258,6 @@ object SnailFishNumber {
 
     val finalResult = allPairs.tail
       .foldLeft(allPairs.head){case (snailFishAccum, snailFish) =>
-        println(s"Addition: ${SnailFishNumber(snailFishAccum, snailFish)}")
         SnailFishNumber(snailFishAccum, snailFish).reduce
       }
 
@@ -88,7 +266,7 @@ object SnailFishNumber {
 
 
   /** Any branch from the root tree that is 4 deep should explode. */
-  private[model] def willExplode(snailFishNumber: SnailFishNumber): Boolean = {
+  private[model] def willExplodeFromRoot(snailFishNumber: SnailFishNumber): Boolean = {
     val depth = SnailFishNumber.findDepth(snailFishNumber)
 
     depth >= 5
@@ -120,148 +298,16 @@ object SnailFishNumber {
   }
 
   /**
-   * When a number explodes, we need to make sure that the root merges any values that
-   * bubble up from the leave nodes to the root branch.
-   * This also is used to propagate values from left to right and right to left
-   *
-   * @param snailFishNumber
-   * @param mergedValue
-   * @return
-   */
-  private[model] def mergeExploded(snailFishNumber: SnailFishNumber | Int,
-                                   mergedValue: Int): SnailFishNumber | Int = {
-    snailFishNumber match {
-      case i: Int => i + mergedValue
-      case sfn: SnailFishNumber =>
-        if (mergedValue == 0) {
-          sfn
-        } else {
-          val updatedLeft: SnailFishNumber | Int = mergeExploded(sfn.left, mergedValue)
-          val updatedRight = if (updatedLeft == sfn.left) {
-            mergeExploded(sfn.right, mergedValue)
-          } else {
-            sfn.right
-          }
-
-          SnailFishNumber(updatedLeft, updatedRight)
-        }
-    }
-  }
-
-
-  /**
-   * This is a helper method that is used to propogate values. This should always
-   * be zero unless we make it to the fourth level of the tree.
-   * We need to take in to see if the original went from SnailFishNumber to Int.
-   * This tells us that it exploded. If it exploded we want to keep the original number
-   */
-  private[model] def bubbleUpValue(snailFishNumber: SnailFishNumber | Int,
-                                   originalSnailFishNumber: SnailFishNumber | Int,
-                                   value: Int): (SnailFishNumber | Int, Int) = {
-    val isChildExplode = originalSnailFishNumber match {
-      case i: Int => false
-      case sfn: SnailFishNumber => true
-    }
-
-    snailFishNumber match {
-      case i: Int => if(isChildExplode) (i, value) else  (i + value, 0)
-      case sfn: SnailFishNumber => (sfn, value)
-    }
-  }
-
-  /**
-   * TODO: This method is longer than I like my method definitions.
-   * The shared Union Type does make this more verbose than I would like. I don't like methods that are over
-   * 30 lines of code. This method is almost exactly 30 lines of code. Each case statement can be broken
-   * up into it's own function.
-   *
-   * The exit condition is to first check if the search depth is at 5 (e.g. nested 4 times). If we are,
-   * then the number returned needs to be 0, and it's left and right values bubble upwards. That's why
-   * the return signature is ugly. the (Int, Int) values are used for parent nodes to know whether or
-   * not to add those values.  If the depth of 5 is a SnailFishNumber, it needs to become 0
-   * One thing I don't like is the whole Int, (Int, Int) results. This could be done in a
-   * typed case class. Keeping for now
-   *
-   * TODO We only do this on a given branch. So we start start at depth 2
-   * @param snailFishNumber
-   * @param depth
-   * @return
-   */
-  private[model] def traverseExplodeSplit(snailFishNumber: SnailFishNumber | Int,
-                                          shouldExplode: Boolean,
-                                          depth: Int = 2): (SnailFishNumber | Int, (Int, Int)) = {
-    if (depth == 5 && shouldExplode) {
-      snailFishNumber match {
-        case i: Int => (i, (0, 0))
-        case sfn: SnailFishNumber =>
-          val left = snailFishNumberAsInt(sfn.left)
-          val right = snailFishNumberAsInt(sfn.right)
-          (0, (left, right))
-      }
-    } else {
-      snailFishNumber match {
-        case i: Int =>
-          val num: SnailFishNumber | Int = if (i >= 10) split(i) else i
-          (num, (0, 0))
-    // TODO SOMEWHERE HERE WE aren't actually bubbling up the addition :Thinking: on the right hand side.
-        case sfn: SnailFishNumber =>
-          val left: (SnailFishNumber | Int, (Int, Int)) =
-            traverseExplodeSplit(sfn.left, shouldExplode, depth + 1)
-            
-          val right: (SnailFishNumber | Int, (Int, Int)) =
-            traverseExplodeSplit(sfn.right, shouldExplode, depth + 1)
-
-          val propogateUp: (Int, Int) = tupleToPropogate(left._2, right._2)
-
-          val finalLeft: (SnailFishNumber | Int, Int) = bubbleUpValue(left._1,  sfn.left, propogateUp._1)
-          val finalRight: (SnailFishNumber | Int, Int) = bubbleUpValue(right._1,  sfn.right, propogateUp._2)
-          val finalBubbleUp = (finalLeft._2, finalRight._2)
-
-          (SnailFishNumber(finalLeft._1, finalRight._1), finalBubbleUp)
-      }
-    }
-  }
-
-
-
-  /**
    * This converts the final a snailfish number to integer. This is specifically for when we are at depth 4
    * where we know snailfish number will left and right are Ints
    * @param snailFishNumber
    * @return: SnailFishNumber as Int
   */
-  private[model] def snailFishNumberAsInt(snailFishNumber: SnailFishNumber | Int): Int = {
+  private[model] def snailFishToInt(snailFishNumber: SnailFishNumber | Int): Int = {
     snailFishNumber match {
       case i: Int => i
       case _      => throw new Exception("Error you should only convert if you know the SnailFishNumber contains two ints")
     }
-  }
-
-  private[model] def tupleToPropogate(left: (Int, Int), right: (Int, Int)): (Int, Int) = {
-    if (tupleSum(left) >= tupleSum(right)) {
-      left
-    } else {
-      right
-    }
-  }
-
-
-  private[model] def tupleSum(in: (Int, Int)): Int = {
-    in._1 + in._2
-  }
-
-  /**
-   * the left element of the pair should be the regular number divided by two and rounded down, while the right element
-   * of the pair should be the regular number divided by two and rounded up. For example, 10 becomes [5,5], 11 becomes
-   * [5,6], 12 becomes [6,6], and so on.
-   * @param i input value that needs to be split.
-   * @return SnailValue of the new split.
-   */
-  private[model] def split(i: Int): SnailFishNumber = {
-    val left  = Math.floor(i / 2.0).toInt
-    val right = Math.ceil(i / 2.0).toInt
-
-    SnailFishNumber(left, right)
   }
 
   private[model] def maxNumberInTree(snailFishNumber: SnailFishNumber | Int,
