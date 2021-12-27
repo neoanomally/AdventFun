@@ -69,7 +69,7 @@ object Dive {
       .groupBy(_.direction)
       .map{ case (direction, values) =>
         direction -> values.map(_.units).sum
-      }.toMap
+      }
   }
 
   def calculatePosition(pilotCommands: Map[Direction, Int]): Position = {
@@ -80,6 +80,7 @@ object Dive {
         case Forward => Position(sum, 0, 0)
         case Down => Position(0, sum, 0)
         case Up => Position(0, -sum, 0)
+        case Left => assert(false, "Error the submarine should not go LEFT / Backwards.")
       }
     }.toList
 

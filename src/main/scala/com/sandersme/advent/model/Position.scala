@@ -4,11 +4,9 @@ case class Position(horizontal: Int, depth: Int, aim: Int) {
   def multiplyPosition = horizontal * depth
 }
 
-enum Direction {
-  case Forward, Down, Up
-}
-
 object Position {
+
+
   val EMPTY_POSITION = Position(0, 0, 0)
 
   extension (position: Position)
@@ -24,6 +22,7 @@ object Position {
 
         Position(horizontal, depth, position.aim)
       }
+      case Direction.Left => assert(false, "Should not make it here for pilot commands")
     }
   }
 
@@ -34,5 +33,3 @@ object Position {
       }
   }
 }
-
-case class PilotCommand(direction: Direction, units: Int)
