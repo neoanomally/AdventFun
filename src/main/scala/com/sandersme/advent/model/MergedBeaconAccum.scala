@@ -36,7 +36,6 @@ case class MergedBeaconAccum(updatedLeft: Vector[Beacon],
     this.copy(updatedMergedBeacons = mergedBeacons)
   }
 
-  // TODO IMPLEMENT ME FUCK BROKE STUFF
   def updateFromFingerprintV2(mergedBeacons: MergedBeacons): MergedBeaconAccum = {
     this.copy(updatedMergedBeacons = mergedBeacons)
   }

@@ -139,7 +139,7 @@ object Scanners {
     if (leftIdx >= scanners.allScanners.size)
       scanners
     else
-      val updatedScanner = findDistinctInner(scanners, leftIdx, leftIdx + 1)
+      val updatedScanner = findDistinctInner(scanners, leftIdx)
 
       findDistinctBeacons(updatedScanner, leftIdx + 1)
   }
@@ -226,12 +226,10 @@ object Scanners {
     val defaultAccum = MergedBeaconAccum(Vector.empty, right, mergedBeacons)
 
     left.foldLeft(defaultAccum) { case (mergedBeaconAccum, leftBeacon) =>
-//      val findFromMergedBeacons: Option[MergedBeacons] = mergedBeacons.findFingerPrintV2(leftBeacon)
       val findFromMergedBeacons: Option[Int] = mergedBeacons.findFingerPrint(leftBeacon)
       if (findFromMergedBeacons.isDefined) {
-                val idx = findFromMergedBeacons.get
-                mergedBeaconAccum.updateFromFingerprint(idx, leftBeacon)
-//        mergedBeaconAccum.updateFromFingerprintV2(findFromMergedBeacons.get)
+        val idx = findFromMergedBeacons.get
+        mergedBeaconAccum.updateFromFingerprint(idx, leftBeacon)
       } else {
         mergedBeaconAccum.updateFromSearchAttempt(leftBeacon)
       }
