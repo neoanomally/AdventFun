@@ -1,5 +1,6 @@
 package com.sandersme.advent.model
 
+import com.sandersme.advent.graph.Coordinate
 import com.sandersme.advent.math.VectorDistanceSyntax.*
 
 import java.security.MessageDigest
@@ -16,43 +17,42 @@ import scala.collection.immutable
  *                     All the distances for the tests due to the space size. This is to prevent
  *                     the space sizes from exploding
  * @param mergedBeacons
+ *
+ * TODO Convert to V2, where we use the raw fingerprints set overlap and no maps at all. This will be
+ * much faster, but this is a pretty major refactor. I have part one done so I'm just going to leave this for
+ * now. The other thing I need to do is figure out the right rotations. That will be done by rotating
+ * each axis until they are in alignment. it's best to start with the scanner 1 and all matching scanners then
+ * traverse and rotate each other scanner to get their absolute positions. We can use scanner 0 as our
+ * absolute position especially since we know scanner 0 has 12 overlapping areas with 1 and 4 in the test
+ * set up. I need to ccompletely remove or refactor mergedBeacons and the MergedBeaconsAccum, it's actually
+ * best to start from scratch. 
  */
 case class Scanners(allScanners: Vector[Scanner], mergedBeacons: MergedBeacons, allDistances: Boolean = false) {
+  case class SharedBeacons(scannerA: Int, scannerB: Int, beacons: Vector[(Coordinate, Coordinate)])
+
   def updateMergedBeacons(updatedMergedBeacons: MergedBeacons): Scanners = {
     this.copy(mergedBeacons = updatedMergedBeacons)
   }
 
-  def distanceBetweenAllScanners: Map[(Int, Int), Long] = {
+  def sharedBeaconsAmongScanners: List[SharedBeacons] = {
     val scannerDistanceMap = defaultScannerDistances
 
-    val allDistances: Seq[Iterable[((Int, Int), Long)]] =
-      mergedBeacons
-        .beacons
-        .map(_.scannerLocs)
-        .flatMap { scannerLoc =>
-          scannerLoc.keys.flatMap { leftKey =>
-            scannerLoc.keys.map { rightKey =>
-              val leftLoc = scannerLoc(leftKey)
-              val rightLoc = scannerLoc(rightKey)
-              val min = Math.min(leftKey, rightKey)
-              val max = Math.min(leftKey, rightKey)
-              val distance = leftLoc manhattan rightLoc
-              println(s"$leftKey $rightKey $distance")
+    defaultScannerDistances
+      .map{ case(left, right) =>
 
-              (min, max) -> distance
-            }.filter(pair => pair._1._1 != pair._1._2)
-          }
-          ???
-        }
+        val sharedBeacons = mergedBeacons
+          .beacons
+          .filter(beacon => beacon.scannerLocs.contains(left) && beacon.scannerLocs.contains(right))
+          .map(beacon => (beacon.scannerLocs(left), beacon.scannerLocs(right)))
 
-//    allDistances.toMap
-    ???
+        SharedBeacons(left, right, sharedBeacons)
+      }
   }
 
-  private[model] def defaultScannerDistances: Map[(Int, Int), Option[Long]] = {
+  private[model] def defaultScannerDistances: List[(Int, Int)] = {
     val scannerCombinations: Seq[(Int, Int)] = for {
       i <- allScanners.indices
-      j <- allScanners.indices
+      j <- i until allScanners.size
 
       min = Math.min(i, j)
       max = Math.max(i, j)
@@ -60,7 +60,7 @@ case class Scanners(allScanners: Vector[Scanner], mergedBeacons: MergedBeacons, 
       if (i != j)
     } yield (min, max)
 
-    scannerCombinations.map(i => i -> None).toMap
+    scannerCombinations.toList
   }
 
   /**

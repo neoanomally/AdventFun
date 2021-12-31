@@ -13,7 +13,7 @@ import com.sandersme.advent.model.LavaFlow.ValueNeighbors
 case class Beacon(scannerLocs: Map[Int, Coordinate],
                   neighbors: Set[Double],
                   fingerPrints: Set[Set[Double]]) {
-  override def toString: String = s"Beacon(Neighbors: $neighbors) \t $scannerLocs"
+  override def toString: String = s"$scannerLocs"
 
   def asVector(id: Int): Vector[Int] = scannerLocs(id).asVector
 }

@@ -47,7 +47,7 @@ object BeaconScanner {
    * In total, there are 79 beacons.
    *
    * Assemble the full map of beacons. How many beacons are there?
-   *
+   * TODO Implement the memory efficient version
    *
    * @param args
    */

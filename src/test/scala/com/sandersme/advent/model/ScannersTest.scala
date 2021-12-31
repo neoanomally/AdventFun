@@ -72,9 +72,13 @@ class ScannersTest extends munit.FunSuite {
 
   test("Find Distinct Beacons looping through all the beacons creating a huge set of mergedBeacons") {
     val firstIterationScanners = Scanners.findDistinctBeacons(LARGER_TEST_SCANNER)
-
-    println(firstIterationScanners.mergedBeacons.beacons.takeRight(5))
-    println(firstIterationScanners.distanceBetweenAllScanners)
+//
+//    firstIterationScanners.sharedBeaconsAmongScanners
+//      .filter(_.beacons.size >= 12)
+//      .filter(shared => shared.scannerA == 0 && shared.scannerB == 1)
+//      .foreach{ v =>
+//        println(s"${v.scannerA} \t ${v.scannerB}")
+//        v.beacons.foreach(pair => println( pair._1 manhattan pair._2))}
 
     assertEquals(firstIterationScanners.estimatedNumberBeacons, 79)
   }
