@@ -25,7 +25,7 @@ import scala.collection.immutable
  * traverse and rotate each other scanner to get their absolute positions. We can use scanner 0 as our
  * absolute position especially since we know scanner 0 has 12 overlapping areas with 1 and 4 in the test
  * set up. I need to ccompletely remove or refactor mergedBeacons and the MergedBeaconsAccum, it's actually
- * best to start from scratch. 
+ * best to start from scratch.
  */
 case class Scanners(allScanners: Vector[Scanner], mergedBeacons: MergedBeacons, allDistances: Boolean = false) {
   case class SharedBeacons(scannerA: Int, scannerB: Int, beacons: Vector[(Coordinate, Coordinate)])
