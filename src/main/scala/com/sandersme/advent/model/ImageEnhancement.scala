@@ -109,7 +109,7 @@ object ImageEnhancement {
       val updatedActivePixels: Seq[(Int, Int)] = for {
         x <- border.minX - modifier to border.maxX + modifier
         y <- border.minY - modifier to border.maxY + modifier
-        
+
         potentialPixel <- updateImageLocation((x, y), imageEnhancement)
       } yield potentialPixel
 
