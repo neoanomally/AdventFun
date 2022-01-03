@@ -1,5 +1,7 @@
 package com.sandersme.advent
 
+import com.sandersme.advent.model.ImageEnhancement
+
 object TrenchMap {
   /**
    * * With the scanners fully deployed, you turn their attention to mapping the
@@ -131,6 +133,42 @@ floor of the ocean trench.
    */
   def main(args: Array[String]): Unit = {
 
+    /**
+     * TODO: Okay so the input is broken into two parts image enhancementa algorithm which is
+     * 512 bytes long. I think I can just store these in an array / vector of that length and
+     * have boolean values these are used to lookup values from the image.
+     *
+     * SO what I need to do for each "On pixel" I need to look at any pixel that has a 3x3
+     * matrix that even touches it. If that maatrix even touches it at the bottom right of that
+     * square or the top left of that square. Those pixels can be turned on. (Need to figure out
+     * how this works with multiple on pixels).
+     *
+     * The next part is the original image... One of the things stressed repeatedly is that the image
+     * is infinite size. I think I need to store the values as a sparse matrix. Essentially points
+     * where they represent the on value. So don't represent this as a aGRID persay. Then to
+     * determine.
+     */
+
+    val input = Input.readFromDataResource("day20_input")
+
+    val imageEnhancement = ImageEnhancement.parseInput(input)
+
+    val twiceEnhanced: ImageEnhancement = imageEnhancement
+      .applyEnhancementAlgorithm(2)
+
+    val fiftyTimesEnhanced = twiceEnhanced.applyEnhancementAlgorithm(48)
+    twiceEnhanced.printGrid
+    println("\n")
+
+    println(s"ORIGINAL COUNT: ${imageEnhancement.activePixelCount}")
+    println(s"Original border dimensions: ${imageEnhancement.borderDimensions}")
+    println(s"Twice enhanced Border Dimensions: ${twiceEnhanced.borderDimensions}")
+
+    println(s"After enhancing the image twice there are ${twiceEnhanced.activePixelCount} active pixels")
+
+    println(s"After enhancing the image 50 times there are ${fiftyTimesEnhanced.activePixelCount} active pixels")
   }
+
+
 
 }
