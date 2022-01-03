@@ -122,7 +122,7 @@ object DiceBoardGame {
   } yield resultThrowOne + resultThrowTwo + resultThrowThree
 
 
-  // TODO figure out recursion first
+  // TODO figure out how to use the frequencies to make this much faster
   // TODO: I need to simulate each round. Instead of just having one player go, we have both players increment.
   // The position Score is going to now keep track of player1 and player two
   def calculateNumUniversesWon(positionScore: PositionScore,
@@ -167,13 +167,13 @@ object DiceBoardGame {
   def bruteForceUniversesWon(positionScore: PositionScore,
                              cache: mutable.Map[PositionScore, (BigInt, BigInt)] = new mutable.HashMap(),
                              diceCombos: Seq[Int] = generateDiceCombos): (BigInt, BigInt) = {
-    if (cache.contains(positionScore)) {
-      cache(positionScore)
-    } else if (positionScore.player1Score >= 21) {
+    if (positionScore.player1Score >= 21) {
       (BigInt(1), BigInt(0))
     } else if (positionScore.player2Score >= 21) {
       (BigInt(0), BigInt(1))
-    } else {
+    } else if (cache.contains(positionScore)) {
+      cache(positionScore)
+    } else{
       val allResults = for {
         player1Dice <- diceCombos
         player2Dice <- diceCombos

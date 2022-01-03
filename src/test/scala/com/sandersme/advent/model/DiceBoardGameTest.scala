@@ -1,6 +1,6 @@
 package com.sandersme.advent.model
 
-import com.sandersme.advent.model.DiceBoardGame.{PositionScore, bruteForceUniversesWon, calculateNumUniversesWon, rollDiceUntilWinner}
+import com.sandersme.advent.model.DiceBoardGame.{PositionScore, bruteForceUniversesWon, calculateNumUniversesWon, generateDiceCombos, rollDiceUntilWinner}
 
 import scala.collection.mutable
 
@@ -45,13 +45,14 @@ class DiceBoardGameTest extends munit.FunSuite {
 
   }
 
-  // IGNORING DUE TO it taking too long
-  test("Different results from throwing the dice 3 times") {
+  // IGNORING DUE TO it taking too long it's a println because the results._1 needs to be divded by 27 and I'm not
+  // sure why. The 27 definitely comes from the combinations of three quantum dice values. But where is it happening at? The beginning?
+  // It's only a mutliple of 27 for player 1, player 2 has the correct result
+  test("Different results from throwing the dice 3 times".ignore) {
     val startingPositionScore = PositionScore(4, 0, 8, 0)
 
     val results = bruteForceUniversesWon(startingPositionScore)
-    println(results._1 / 27)
-    println(results._2)
+    println(results)
   }
 
 // TODO LOOK INTO MEMOIZATION MORE
