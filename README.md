@@ -37,6 +37,9 @@ TODO: Maybe make this more generic instead of a main per... But the mains where 
 13. Day Thirteen: `sbt "runMain com.sandersme.advent.TransparentOragami"`
 14. Day Fourteen: `sbt "runMain com.sandersme.advent.ExtendedPolymeritization"`
 15. Day Fifteen:  `sbt "runMain com.sandersme.advent.CaveChitonRiskPath"`
-16. Day Sixteen:  `sbt "runMain com.sandersme.advent.PacketDecoder`
-17. Day Seventeen `sbt "runMain com.sandersme.advent.TrickShot`
-18. Day Eighteen: `sbt "runMain com.sandersme.advent.SnailFish`
+16. Day Sixteen:  `sbt "runMain com.sandersme.advent.PacketDecoder"`
+17. Day Seventeen `sbt "runMain com.sandersme.advent.TrickShot"`
+18. Day Eighteen: `sbt "runMain com.sandersme.advent.SnailFish"`
+19. Day Nineteen: `sbt "runMain com.sandersme.advent.BeaconScanner"`
+20. Day Twenty:   `sbt "runMain com.sandersme.advent.TrenchMap"`
+21. Day TWentyOne:`sbt "runMain com.sandersme.advent.DiracDiceBoardGame"`
