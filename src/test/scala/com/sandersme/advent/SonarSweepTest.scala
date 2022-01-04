@@ -1,9 +1,9 @@
-package com.sandersme.advent
+package com.sandersme.advent.twentyone
 
 import junit.framework.TestCase.assertTrue
 import munit.Assertions.*
 import SonarSweep.*
-import com.sandersme.advent.model.Accumulator.calculateIncreases
+import com.sandersme.advent.twentyone.model.Accumulator.calculateIncreases
 
 class SonarSweepTest extends munit.FunSuite  {
   test("Calculate empty list should have 0") {

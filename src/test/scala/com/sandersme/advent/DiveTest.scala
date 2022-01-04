@@ -1,9 +1,9 @@
-package com.sandersme.advent
+package com.sandersme.advent.twentyone
 
 
-import com.sandersme.advent.Dive.calculatePosition
-import com.sandersme.advent.model.{Direction, PilotCommand, Position}
-import com.sandersme.advent.Input
+import com.sandersme.advent.twentyone.Dive.calculatePosition
+import com.sandersme.advent.twentyone.Input
+import com.sandersme.advent.twentyone.model.{Direction, Position}
 
 class DiveTest extends munit.FunSuite {
   val DAY_TWO_TEST_INPUT = List(
