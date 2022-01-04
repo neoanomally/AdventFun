@@ -70,11 +70,11 @@ object DiracDiceBoardGame {
 
     val startingPositionScore = DiceBoardGame.PositionScore.fromInput(input)
 
-    val results = bruteForceUniversesWon(startingPositionScore)
-    println(s"Playing a game with quantum dice: Player 1 wins in ${results._1 / 27} universes" +
+    val results = DiceBoardGame.quantumDiceGame(startingPositionScore)
+    println(s"Playing a game with quantum dice: Player 1 wins in ${results._1} universes" +
       s"and player two wins in ${results._2} universes")
 
-    val winner = if (results._1 / 27 > results._2) results._1 / 27 else results._2
+    val winner = if (results._1 > results._2) results._1 else results._2
     println(s"The winning number is: ${winner}")
   }
 }

@@ -36,8 +36,6 @@ class RateLimiterTest extends munit.FunSuite {
       Thread.sleep(50)
       updatedAccum
     }
-
-    println(accumulator)
   }
 
 }

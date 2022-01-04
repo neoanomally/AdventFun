@@ -52,7 +52,6 @@ class ImageEnhancementTest extends munit.FunSuite {
     val testImageEnhancementB = ImageEnhancement.apply(Set((0, 0), (2, 2)), Vector.empty)
     val allActiveNeighborsB = ImageEnhancement.getAllActiveNeighbors(testImageEnhancementB)
 
-    println(allActiveNeighborsA.size)
     assertEquals(allActiveNeighborsA.size, 50)
     assertEquals(allActiveNeighborsB.size, 41)
   }

@@ -46,13 +46,12 @@ class DiceBoardGameTest extends munit.FunSuite {
   }
 
   // IGNORING DUE TO it taking too long it's a println because the results._1 needs to be divded by 27 and I'm not
-  // sure why. The 27 definitely comes from the combinations of three quantum dice values. But where is it happening at? The beginning?
-  // It's only a mutliple of 27 for player 1, player 2 has the correct result
+  // This does produce the correct results
   test("Different results from throwing the dice 3 times".ignore) {
-    val startingPositionScore = PositionScore(4, 0, 8, 0)
+    val results = DiceBoardGame.quantumDiceGame(4, 8)
 
-    val results = bruteForceUniversesWon(startingPositionScore)
-    println(results)
+    assertEquals(results._1, BigInt(444356092776315L))
+    assertEquals(results._2, BigInt(341960390180808L))
   }
 
 // TODO LOOK INTO MEMOIZATION MORE

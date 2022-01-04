@@ -76,6 +76,7 @@ object DiceBoardGame {
   type LookupMap = Map[Lookup, Results]
   type DiceResult = Int
   type Frequency = Int
+
   def tripleDiceCombinations: Map[DiceResult, Frequency] = {
     val results = for {
       resultThrowOne <- 1 to 3
@@ -158,8 +159,23 @@ object DiceBoardGame {
     }
   }
 
+  def quantumDiceGame(player1Starting: Int, player2Starting: Int): (BigInt, BigInt) = {
+    val starting = PositionScore(player1Starting, 0, player2Starting, 0)
+    quantumDiceGame(starting)
+  }
+
+  def quantumDiceGame(positionScore: PositionScore): (BigInt, BigInt) = {
+    val winners = bruteForceUniversesWon(positionScore)
+
+    (winners._1 / 27, winners._2)
+  }
+
 
   // TODO figure out recursion first
+  // TODO I figured out why p1 wins by a factor of 27. This happens because when Player 1 wins. The previous
+  // roll spawns 27 universes for the combinations that player 2 may win. I'm fine keeping it with how it
+  // is knowing that it's up by a factor of 27. What I could do is incrementally build up the turns, but
+  // that includes additional logic .
   // TODO: I need to simulate each round. Instead of just having one player go, we have both players increment.
   // The position Score is going to now keep track of player1 and player two
   def bruteForceUniversesWon(positionScore: PositionScore,
@@ -171,7 +187,7 @@ object DiceBoardGame {
       (BigInt(0), BigInt(1))
     } else if (cache.contains(positionScore)) {
       cache(positionScore)
-    } else{
+    }else{
       val allResults = for {
         player1Dice <- diceCombos
         player2Dice <- diceCombos

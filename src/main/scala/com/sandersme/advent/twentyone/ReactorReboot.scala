@@ -1,5 +1,8 @@
 package com.sandersme.advent.twentyone
 
+import com.sandersme.advent.twentyone.graph.Coordinate
+import com.sandersme.advent.twentyone.model.Cuboid
+
 object ReactorReboot {
 
   /**
@@ -68,6 +71,12 @@ object ReactorReboot {
    * @param args
    */
   def main(args: Array[String]): Unit = {
+    val input = Input.readFromDataResource("day22_input")
 
+    val cuboids = Cuboid.parseInput(input.take(20))
+
+    val cubes = Cuboid.processCuboidsInPartOne(cuboids)
+
+    println(s"The number of cubes left in part 1 are ${cubes.size}")
   }
 }
