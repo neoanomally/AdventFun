@@ -1,7 +1,7 @@
 package com.sandersme.advent.twentyone
 
+import com.sandersme.advent.Input
 import com.sandersme.advent.twentyone.model.Polymizer
-import com.sandersme.advent.twentyone.Input
 
 /**
  * * The incredible pressures at this depth are starting to put a strain on your
@@ -52,7 +52,7 @@ import com.sandersme.advent.twentyone.Input
  */
 object ExtendedPolymeritization {
   def main(args: Array[String]): Unit = {
-    val input = Input.readFromDataResource("day14_input")
+    val input = Input.readTwentyOneFromResource("day14_input")
     val polymizer = Polymizer.parseInput(input)
 
     val tenStepPolymizer = Polymizer.applyInsertionRuleNSteps(polymizer, 10)

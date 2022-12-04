@@ -1,6 +1,6 @@
 package com.sandersme.advent.twentyone
 
-import com.sandersme.advent.twentyone.Input
+import com.sandersme.advent.Input
 import com.sandersme.advent.twentyone.model.Accumulator.calculateIncreases
 import com.sandersme.advent.twentyone.model.{Accumulator, SingleAccumulator, SlidingWindowAccumulator}
 import com.sandersme.advent.twentyone.algorithm.LimitQueue
@@ -32,7 +32,7 @@ object SonarSweep {
   val DAY_1_INPUT = "day1_input"
 
   def main(args: Array[String]): Unit = {
-    val lines = Input.readFromDataResource(DAY_1_INPUT)
+    val lines = Input.readTwentyOneFromResource(DAY_1_INPUT)
 
     val depths = lines.map(_.toInt)
 

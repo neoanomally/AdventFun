@@ -1,5 +1,6 @@
 package com.sandersme.advent.twentyone
 
+import com.sandersme.advent.Input
 import com.sandersme.advent.twentyone.model.CrabMovement
 
 
@@ -70,7 +71,7 @@ object TreacheryOfWhales {
    *
    */
   def main(args: Array[String]): Unit = {
-    val input: String = Input.readFromDataResource("day7_input").head
+    val input: String = Input.readTwentyOneFromResource("day7_input").head
 
     val crabMovement = CrabMovement.parseInput(input)
     val optimalMovementCost = crabMovement.findMinimalFuelPosition

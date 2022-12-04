@@ -1,7 +1,7 @@
 package com.sandersme.advent.twentyone
 
-import com.sandersme.advent.twentyone.Input
-import com.sandersme.advent.twentyone.packet._
+import com.sandersme.advent.Input
+import com.sandersme.advent.twentyone.packet.*
 
 object PacketDecoder {
 
@@ -128,7 +128,7 @@ object PacketDecoder {
    * exactly two sub-packets.
    */
   def main(args: Array[String]): Unit = {
-    val inputData = Input.readFromDataResource("day16_input")
+    val inputData = Input.readTwentyOneFromResource("day16_input")
     val packets: List[Packet] = Packet.fromHex(inputData.head)
     val sumOfVersions = Packet.calculateVersionSum(packets)
     val totalFinalVal = Packet.calculateFinalValue(packets)

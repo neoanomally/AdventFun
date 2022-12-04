@@ -1,5 +1,6 @@
 package com.sandersme.advent.twentyone
 
+import com.sandersme.advent.Input
 import com.sandersme.advent.twentyone.model.Brackets
 
 /**
@@ -73,7 +74,7 @@ import com.sandersme.advent.twentyone.model.Brackets
  **/
 object SyntaxScoring {
  def main(args: Array[String]): Unit = {
-  val input = Input.readFromDataResource("day10_input")
+  val input = Input.readTwentyOneFromResource("day10_input")
   val bracketsInput = Brackets.parseInput(input)
 
   val inputScore = Brackets.calculateCorruptedScore(bracketsInput)

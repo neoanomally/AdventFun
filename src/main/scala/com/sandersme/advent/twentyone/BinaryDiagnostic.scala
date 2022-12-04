@@ -1,5 +1,6 @@
 package com.sandersme.advent.twentyone
 
+import com.sandersme.advent.Input
 import com.sandersme.advent.twentyone.model.Diagnostics
 
 object BinaryDiagnostic {
@@ -45,7 +46,7 @@ To find CO2 scrubber rating, determine the least common value (0 or 1) in the cu
    */
   def main(args: Array[String]): Unit = {
 
-    val binaryInput = Input.readFromDataResource("day3_input")
+    val binaryInput = Input.readTwentyOneFromResource("day3_input")
 
     val diagnostics: Diagnostics = Diagnostics.fromBinaryInput(binaryInput)
 

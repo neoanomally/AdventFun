@@ -1,5 +1,6 @@
 package com.sandersme.advent.twentyone
 
+import com.sandersme.advent.Input
 import com.sandersme.advent.twentyone.model.LanternFish
 
 object SpawningLanternfish {
@@ -42,7 +43,7 @@ object SpawningLanternfish {
    */
 
   def main(args: Array[String]): Unit = {
-    val input = Input.readFromDataResource("day6_input")
+    val input = Input.readTwentyOneFromResource("day6_input")
     val lanternFish = LanternFish.fromInput(input.head)
 
     val totalFishOverEightyDays = lanternFish.growAllFishOverTime(80)

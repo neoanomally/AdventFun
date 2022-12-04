@@ -1,5 +1,6 @@
 package com.sandersme.advent.twentyone
 
+import com.sandersme.advent.Input
 import com.sandersme.advent.twentyone.model.ProbeLauncher
 
 /**
@@ -158,7 +159,7 @@ import com.sandersme.advent.twentyone.model.ProbeLauncher
  */
 object TrickShot {
   def main(args: Array[String]): Unit = {
-    val input = Input.readFromDataResource("day17_input")
+    val input = Input.readTwentyOneFromResource("day17_input")
 
     val probe: ProbeLauncher = ProbeLauncher.parseInput(input.head)
     val maximumY = probe.findLegalMaxY

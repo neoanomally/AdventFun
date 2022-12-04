@@ -1,8 +1,8 @@
 package com.sandersme.advent.twentyone
 
 
+import com.sandersme.advent.Input
 import com.sandersme.advent.twentyone.Dive.calculatePosition
-import com.sandersme.advent.twentyone.Input
 import com.sandersme.advent.twentyone.model.{Direction, Position}
 
 class DiveTest extends munit.FunSuite {

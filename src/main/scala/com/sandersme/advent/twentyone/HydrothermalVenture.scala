@@ -1,6 +1,6 @@
 package com.sandersme.advent.twentyone
 
-import com.sandersme.advent.twentyone.Input
+import com.sandersme.advent.Input
 import com.sandersme.advent.twentyone.model.VentLine
 
 object HydrothermalVenture {
@@ -36,7 +36,7 @@ object HydrothermalVenture {
    */
 
   def main(args: Array[String]): Unit = {
-    val inputData = Input.readFromDataResource("day5_input")
+    val inputData = Input.readTwentyOneFromResource("day5_input")
 
     val ventLines = VentLine.parseInputs(inputData)
     val numberOfOVerlappingPoints = VentLine.countNumberOfOverlappingPoints(ventLines)

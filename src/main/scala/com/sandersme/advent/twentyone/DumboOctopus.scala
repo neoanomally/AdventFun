@@ -1,5 +1,6 @@
 package com.sandersme.advent.twentyone
 
+import com.sandersme.advent.Input
 import com.sandersme.advent.twentyone.model.DumboGrid
 
 /**
@@ -48,7 +49,7 @@ import com.sandersme.advent.twentyone.model.DumboGrid
  */
 object DumboOctopus {
   def main(args: Array[String]): Unit = {
-    val input = Input.readFromDataResource("day11_input")
+    val input = Input.readTwentyOneFromResource("day11_input")
     val dumboGrid = DumboGrid.parseInput(input)
 
     val dumbGrid100Steps = (0 to 100).foldLeft(dumboGrid){ case (grid, _) =>

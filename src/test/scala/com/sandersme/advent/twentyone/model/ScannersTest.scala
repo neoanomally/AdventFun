@@ -1,10 +1,10 @@
 package com.sandersme.advent.twentyone.model
 
-import com.sandersme.advent.twentyone.Input
+import com.sandersme.advent.Input
 
 class ScannersTest extends munit.FunSuite {
   val LARGER_TEST_SCANNER: Scanners = Scanners.parseIntput(
-    Input.readFromDataResource("day19_larger_test"), false)
+    Input.readTwentyOneFromResource("day19_larger_test"), false)
 
   test("Validate that I can parse header from --- scanner 0 ---") {
     val headerInput = "--- scanner 0 ---"

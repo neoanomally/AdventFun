@@ -1,5 +1,6 @@
 package com.sandersme.advent.twentyone
 
+import com.sandersme.advent.Input
 import com.sandersme.advent.twentyone.model.ImageEnhancement
 
 object TrenchMap {
@@ -149,7 +150,7 @@ floor of the ocean trench.
      * determine.
      */
 
-    val input = Input.readFromDataResource("day20_input")
+    val input = Input.readTwentyOneFromResource("day20_input")
 
     val imageEnhancement = ImageEnhancement.parseInput(input)
 

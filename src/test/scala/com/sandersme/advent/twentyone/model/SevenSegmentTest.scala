@@ -1,6 +1,6 @@
 package com.sandersme.advent.twentyone.model
 
-import com.sandersme.advent.twentyone.Input
+import com.sandersme.advent.Input
 import com.sandersme.advent.twentyone.model.SevenSegment.Mapping
 
 class SevenSegmentTest extends munit.FunSuite {
@@ -93,7 +93,7 @@ class SevenSegmentTest extends munit.FunSuite {
   // THIS PASSED PART 1 WTF
   test("Test something that I hate about myself because I don't read well.") {
 
-    val input = Input.readFromDataResource("day8_input")
+    val input = Input.readTwentyOneFromResource("day8_input")
     val inputSevenSegment = SevenSegment.parseInput(input)
 
     val outputValues = inputSevenSegment

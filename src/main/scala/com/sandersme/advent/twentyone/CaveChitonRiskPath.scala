@@ -1,7 +1,8 @@
 package com.sandersme.advent.twentyone
 
+import com.sandersme.advent.Input
 import com.sandersme.advent.twentyone.model.ChitonPath
-import com.sandersme.advent.twentyone.model.ChitonPath._
+import com.sandersme.advent.twentyone.model.ChitonPath.*
 
 import scala.collection.mutable
 
@@ -46,7 +47,7 @@ object CaveChitonRiskPath {
    * @param args
    */
   def main(args: Array[String]): Unit = {
-    val input = Input.readFromDataResource("day15_input")
+    val input = Input.readTwentyOneFromResource("day15_input")
     val chitonRiskPath = ChitonPath.parseInput(input)
 
     val shortestRoute = findShortestRoute(chitonRiskPath)

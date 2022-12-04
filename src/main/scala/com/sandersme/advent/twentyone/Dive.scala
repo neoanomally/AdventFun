@@ -1,6 +1,7 @@
 package com.sandersme.advent.twentyone
 
-import com.sandersme.advent.twentyone.Input.{parseDay2Input, readFromDataResource, readFromResource}
+import com.sandersme.advent.Input
+import com.sandersme.advent.Input.{parseDay2Input, readTwentyOneFromResource, readFromDataResource}
 import com.sandersme.advent.twentyone.model.{Direction, PilotCommand, Position}
 
 /**
@@ -42,7 +43,7 @@ object Dive {
   val DAY_2_INPUT = "day2_input"
 
   def main(args: Array[String]): Unit = {
-    val dayTwoInput: List[String] = readFromDataResource(DAY_2_INPUT)
+    val dayTwoInput: List[String] = readTwentyOneFromResource(DAY_2_INPUT)
 
     val parsedInput = dayTwoInput.map(Input.parseDay2Input)
     val partTwoPosition = Position.calculatePosition(parsedInput)

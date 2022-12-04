@@ -1,5 +1,6 @@
 package com.sandersme.advent.twentyone
 
+import com.sandersme.advent.Input
 import com.sandersme.advent.twentyone.model.Scanners
 
 object BeaconScanner {
@@ -52,7 +53,7 @@ object BeaconScanner {
    * @param args
    */
   def main(args: Array[String]): Unit = {
-    val input = Input.readFromDataResource("day19_input")
+    val input = Input.readTwentyOneFromResource("day19_input")
 
     val inputScanners = Scanners.parseIntput(input, true)
     val scannersWithDistinctBeacons = Scanners.findDistinctBeacons(inputScanners)

@@ -1,10 +1,10 @@
 package com.sandersme.advent.twentyone.model
 
-import com.sandersme.advent.twentyone.Input
+import com.sandersme.advent.Input
 import com.sandersme.advent.twentyone.binary.{One, Zero}
 
 class ImageEnhancementTest extends munit.FunSuite {
-  val data: List[String] = Input.readFromDataResource("day20_testinput")
+  val data: List[String] = Input.readTwentyOneFromResource("day20_testinput")
   val TEST_IMAGE_ENHANCEMENT: ImageEnhancement = ImageEnhancement.parseInput(data)
 
   test("Validate that parse input works as expected.") {
@@ -115,7 +115,7 @@ class ImageEnhancementTest extends munit.FunSuite {
   }
 
   test("Full day20_input results are 5291") {
-    val fullInput = Input.readFromDataResource("day20_input")
+    val fullInput = Input.readTwentyOneFromResource("day20_input")
     val imageEnhancement = ImageEnhancement.parseInput(fullInput)
     val twiceEnhanced = imageEnhancement.applyEnhancementAlgorithm(2)
 

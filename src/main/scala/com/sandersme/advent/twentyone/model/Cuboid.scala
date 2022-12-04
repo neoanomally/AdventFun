@@ -6,9 +6,49 @@ import scala.util.matching.Regex
 
 type Cuboids = List[Cuboid]
 
-case class Cuboid(xMin: Int, xMax: Int, yMin: Int, yMax: Int, zMin: Int, zMax: Int, isOn: Boolean)
+case class Cuboid(xMin: Int, xMax: Int, yMin: Int, yMax: Int, zMin: Int, zMax: Int,
+                  isOn: Boolean = true) {
+  def volume: Int = {
+    // The +1 is because a min, max 10, 10, 10, 10, 10, 10 is a sized 1 cuboid. 
+    val length = xMax - xMin + 1
+    val width = yMax - yMin + 1
+    val height = zMax - zMin + 1
 
+    length * width * height
+  }
+}
 object Cuboid {
+
+  def intersection(cuboidA: Cuboid, cuboidB: Cuboid): Option[Cuboid] = {
+    val maxMinX = Math.min(cuboidA.xMax, cuboidB.xMax)
+    val minMaxX = Math.max(cuboidA.xMin, cuboidB.xMin)
+
+    val maxMinY = Math.min(cuboidA.yMax, cuboidB.yMax)
+    val minMaxY = Math.max(cuboidA.yMin, cuboidB.yMin)
+
+    val maxMinZ = Math.min(cuboidA.zMax, cuboidB.zMax)
+    val minMaxZ = Math.max(cuboidA.zMin, cuboidB.zMin)
+
+    val cuboid = Cuboid(minMaxX, maxMinX, minMaxY, maxMinY, minMaxZ, maxMinZ)
+
+    if (cuboid.xMin> cuboid.xMax || cuboid.yMin > cuboid.yMax || cuboid.zMin > cuboid.zMax)
+      None
+    else
+      Some(cuboid)
+  }
+
+  def add(cuboidA: Cuboid, cuboidB: Cuboid): Cuboid = {
+    val xMin = Math.min(cuboidA.xMin, cuboidB.xMin)
+    val xMax = Math.max(cuboidA.xMax, cuboidB.xMax)
+    val yMin = Math.min(cuboidA.yMin, cuboidB.yMin)
+    val yMax = Math.max(cuboidA.yMax, cuboidB.yMax)
+    val zMin = Math.min(cuboidA.zMin, cuboidB.zMin)
+    val zMax = Math.max(cuboidA.zMax, cuboidB.zMax)
+
+    Cuboid(xMin, xMax, yMin, yMax, zMin, zMax)
+  }
+
+
 
   /**
    * Todo this does not scale :D 

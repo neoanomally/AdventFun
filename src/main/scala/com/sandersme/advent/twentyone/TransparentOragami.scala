@@ -1,5 +1,6 @@
 package com.sandersme.advent.twentyone
 
+import com.sandersme.advent.Input
 import com.sandersme.advent.twentyone.model.FoldableGrid
 import com.sandersme.advent.twentyone.model.FoldableGrid.foldOneStep
 object TransparentOragami {
@@ -72,7 +73,7 @@ first fold. After the first fold in the example above, 17 dots are visible -
 dots that end up overlapping after the fold is completed count as a single dot.
    */
   def main(args: Array[String]): Unit = {
-    val input = Input.readFromDataResource("day13_input")
+    val input = Input.readTwentyOneFromResource("day13_input")
 
     val foldableGrid = FoldableGrid.parseInput(input)
 

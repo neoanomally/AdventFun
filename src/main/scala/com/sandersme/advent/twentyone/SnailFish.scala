@@ -1,5 +1,6 @@
 package com.sandersme.advent.twentyone
 
+import com.sandersme.advent.Input
 import com.sandersme.advent.twentyone.model.SnailFishNumber
 
 object SnailFish {
@@ -51,7 +52,7 @@ object SnailFish {
 
   def main(args: Array[String]): Unit = {
 
-    val input = Input.readFromDataResource("day18_input")
+    val input = Input.readTwentyOneFromResource("day18_input")
 
     val snailFishMathHomework = SnailFishNumber.parseInput(input)
 

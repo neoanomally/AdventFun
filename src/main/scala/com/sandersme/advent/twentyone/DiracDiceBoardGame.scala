@@ -1,5 +1,6 @@
 package com.sandersme.advent.twentyone
 
+import com.sandersme.advent.Input
 import com.sandersme.advent.twentyone.model.DiceBoardGame
 import com.sandersme.advent.twentyone.model.DiceBoardGame.{bruteForceUniversesWon, rollDiceUntilWinner}
 
@@ -59,7 +60,7 @@ import com.sandersme.advent.twentyone.model.DiceBoardGame.{bruteForceUniversesWo
 object DiracDiceBoardGame {
 
   def main(args: Array[String]): Unit = {
-    val input = Input.readFromDataResource("day21_input")
+    val input = Input.readTwentyOneFromResource("day21_input")
 
     val diceBoardGame = DiceBoardGame.parseInput(input)
 

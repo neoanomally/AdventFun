@@ -1,7 +1,7 @@
 package com.sandersme.advent.twentyone
 
+import com.sandersme.advent.Input
 import com.sandersme.advent.twentyone.model.BingoSubsystem
-import com.sandersme.advent.twentyone.Input
 
 
 object GiantSquidBingo {
@@ -29,7 +29,7 @@ object GiantSquidBingo {
    * @param args
    */
   def main(args: Array[String]): Unit = {
-    val inputData = Input.readFromDataResource("day4_input")
+    val inputData = Input.readTwentyOneFromResource("day4_input")
 
     val bingoSubsystem =  BingoSubsystem
       .fromInput(inputData)

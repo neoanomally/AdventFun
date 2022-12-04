@@ -1,5 +1,6 @@
 package com.sandersme.advent.twentyone
 
+import com.sandersme.advent.Input
 import com.sandersme.advent.twentyone.model.PathFinder
 
 object PassagePathing {
@@ -50,7 +51,7 @@ object PassagePathing {
    * @param args
    */
   def main(args: Array[String]): Unit = {
-    val input = Input.readFromDataResource("day12_input")
+    val input = Input.readTwentyOneFromResource("day12_input")
 
     val pathMap = PathFinder.parseInput(input)
 
