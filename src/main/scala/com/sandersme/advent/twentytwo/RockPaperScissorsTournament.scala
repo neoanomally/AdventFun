@@ -1,6 +1,10 @@
 package com.sandersme.advent.twentytwo
 
-object RockPaperScissors {
+import com.sandersme.advent.Input
+import com.sandersme.advent.twentytwo.model.RockPaperScissors
+import com.sandersme.advent.twentytwo.model.HandShape
+
+object RockPaperScissorsTournament {
   /**
    * The Elves begin to set up camp on the beach. To decide whose tent gets to be closest to the snack storage, a
    * giant Rock Paper Scissors tournament is already in progress.
@@ -28,6 +32,12 @@ object RockPaperScissors {
      * @param args
    */
   def main(args: Array[String]): Unit = {
+    val input = Input.readTwentyTwoFromResource("day2_input")
 
+    val totalScore = RockPaperScissors.partOneTotalScoreFromInput(input)
+    println(s"Total score from input for part one would be equal to ${totalScore}")
+
+    val totalScorePartTwo = RockPaperScissors.partTwoTotalScoreFromInput(input)
+    println(s"Total score from input for part two would be equal to ${totalScorePartTwo}")
   }
 }
