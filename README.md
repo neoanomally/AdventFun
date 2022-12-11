@@ -1,4 +1,6 @@
-# Advent of Code 2021
+# Advent of Code - Mike Sanders
+
+2021 & 2022
 
 Every year I mean to do Advent of code, but by the time I remember it's the end of the year. 
 
@@ -21,6 +23,7 @@ sbt test
 ```
 
 TODO: Maybe make this more generic instead of a main per... But the mains where I've been storing the problem statements. 
+TODO: Add in 2022 into the README
 ## Running the various Days:
 1. Day One:       `sbt "runMain com.sandersme.advent.SonarSweep"`
 2. Day Two:       `sbt "runMain com.sandersme.advent.Dive"`
