@@ -72,4 +72,5 @@ class RucksackTest extends munit.FunSuite {
 
     assertEquals(tripletSums, expectedTotal)
   }
+  
 }
