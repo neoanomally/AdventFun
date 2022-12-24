@@ -19,18 +19,30 @@ case class CrateSupply(stackSeq: Seq[CrateStack], allInstructions: List[CrateIns
       .mkString
   }
 
-  def moveForwardAllInstructions: CrateSupply = {
+  def moveForwardAllInstructionsPartOne: CrateSupply = {
     val finalStateAfterAllInstructions = allInstructions
       .indices
       .foldLeft(this) { (crateSupply, _) =>
-        crateSupply.moveForwardOneInstruction
+        crateSupply.moveForwardOneInstructionPartOne
       }
 
     finalStateAfterAllInstructions
   }
 
-  def moveForwardOneInstruction: CrateSupply = {
-    CrateSupply.moveForwardOneInstruction(this)
+  def moveForwardAllInstructionsPartTwo: CrateSupply = {
+    allInstructions
+      .indices
+      .foldLeft(this) {(crateSupply, _) =>
+        crateSupply.moveForwardOneInstructionPartTwo
+      }
+  }
+
+  def moveForwardOneInstructionPartOne: CrateSupply = {
+    CrateSupply.moveForwardOneInstruction(this, CrateStack.splitMoveTopN)
+  }
+
+  def moveForwardOneInstructionPartTwo: CrateSupply = {
+    CrateSupply.moveForwardOneInstruction(this, CrateStack.moveTopNAsIs)
   }
 }
 
@@ -120,7 +132,9 @@ object CrateSupply {
     }
   }
 
-  def moveForwardOneInstruction(crateSupply: CrateSupply): CrateSupply = {
+  type MoveFn = (CrateStack, Int) => (CrateStack, CrateStack)
+
+  def moveForwardOneInstruction(crateSupply: CrateSupply, moveFn: MoveFn): CrateSupply = {
     assert(crateSupply.allInstructions.nonEmpty)
     val crateInstruction = crateSupply.allInstructions.head
 
@@ -130,7 +144,7 @@ object CrateSupply {
     val srcStack: CrateStack = crateSupply.stackSeq(crateInstruction.fromIdx - 1)
     val toUpdateStack = crateSupply.stackSeq(crateInstruction.toIdx - 1)
 
-    val (itemsToMove, updatedSrcStack) =  CrateStack.splitMoveTopN(srcStack, crateInstruction.moveN)
+    val (itemsToMove, updatedSrcStack) =  moveFn(srcStack, crateInstruction.moveN)
 
     val updatedDstStack = CrateStack(itemsToMove.stack ++ toUpdateStack.stack)
 

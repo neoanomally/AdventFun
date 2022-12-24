@@ -26,10 +26,17 @@ object SupplyStacks {
 
     val crateSupply = CrateSupply.fromInputSeq(input)
 
-    val topEachStack = crateSupply
-      .moveForwardAllInstructions
+    val topEachStackPartOne = crateSupply
+      .moveForwardAllInstructionsPartOne
       .printTopEachStack
 
-    println(s"After all the move instructions the top of each stack is: ${topEachStack}")
+    println(s"After all the move instructions the top of each stack is: ${topEachStackPartOne}")
+
+    val topEachStackPartTwo = crateSupply
+      .moveForwardAllInstructionsPartTwo
+      .printTopEachStack
+
+    println(s"After all the move instructions the top of each stack is: ${topEachStackPartTwo}")
+
   }
 }

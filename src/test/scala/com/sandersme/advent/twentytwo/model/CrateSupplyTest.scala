@@ -21,7 +21,7 @@ class CrateSupplyTest extends munit.FunSuite {
     val moveInstruction = CrateInstruction(2, 1, 3)
     val crateSupply = CrateSupply(Seq(stack1, stack2, stack3), List(moveInstruction))
 
-    val updatedCrateSupply = CrateSupply.moveForwardOneInstruction(crateSupply)
+    val updatedCrateSupply = CrateSupply.moveForwardOneInstruction(crateSupply, CrateStack.splitMoveTopN)
 
     val expectedStack1 = CrateStack(List('c'))
     val expectedStack3 = CrateStack(List('b', 'a', 'd'))
@@ -119,10 +119,10 @@ class CrateSupplyTest extends munit.FunSuite {
   }
 
 
-  test("move forward all instructions") {
+  test("move forward all instructions for part one") {
     val crateSupply = CrateSupply.fromInputSeq(TEST_INPUT)
 
-    val finalCrateSupply = crateSupply.moveForwardAllInstructions
+    val finalCrateSupply = crateSupply.moveForwardAllInstructionsPartOne
     val expectedFinalCrateStacks: Seq[CrateStack] = Seq(
       CrateStack(List('C')),
       CrateStack(List('M')),
@@ -137,10 +137,24 @@ class CrateSupplyTest extends munit.FunSuite {
   test("print off the top of the final stack should equal CMZ") {
     val crateSupply = CrateSupply.fromInputSeq(TEST_INPUT)
 
-    val finalCrateSupply = crateSupply.moveForwardAllInstructions
+    val finalCrateSupply = crateSupply.moveForwardAllInstructionsPartOne
     val topEachStackString = finalCrateSupply.printTopEachStack
     val expectedOutput = "CMZ"
 
     assertEquals(topEachStackString, expectedOutput)
+  }
+
+  test("Move forward all instructions for part two") {
+    val crateSupply = CrateSupply.fromInputSeq(TEST_INPUT)
+
+    val finalCrateSupply = crateSupply.moveForwardAllInstructionsPartTwo
+
+    val expectedFinalCrateStacks: Seq[CrateStack] = Seq(
+      CrateStack(List('M')),
+      CrateStack(List('C')),
+      CrateStack(List('D', 'N', 'Z', 'P'))
+    )
+
+    assertEquals(finalCrateSupply.stackSeq, expectedFinalCrateStacks)
   }
 }

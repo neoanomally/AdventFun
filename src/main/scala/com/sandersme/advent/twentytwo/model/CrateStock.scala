@@ -21,4 +21,14 @@ object CrateStack {
 
     (CrateStack(itemsPopped), CrateStack(remainingStack))
   }
+
+  def moveTopNAsIs(originalStack: CrateStack, n: Int): (CrateStack, CrateStack) = {
+    val itemsPopped = originalStack
+      .stack
+      .take(n)
+
+    val remainingStack = originalStack.stack.drop(n)
+
+    (CrateStack(itemsPopped), CrateStack(remainingStack))
+  }
 }
