@@ -14,46 +14,12 @@ class RopeGridTest extends munit.FunSuite {
 
   val TEST_ROPE_GRID: RopeGrid = RopeGrid.parseInput(TEST_INPUT)
 
-  test("Validate that the nine different positions around {X} should not require Tail to move") {
-    val head: Coord = Coord(3, 3)
 
-    val tailCoords = for {
-      x <- 2 to 4
-      y <- 2 to 4
-    }  yield Coord(x, y)
-
-    val ropeGrids = tailCoords.map{ tailCoord =>
-      RopeGrid(head, tailCoord, Set(), RopeInstructions.empty)
-    }
-
-    val allWithinOne = ropeGrids.forall(_.isTailAdjacent)
-
-    assertEquals(ropeGrids.size, 9)
-    assertEquals(allWithinOne, true)
-  }
-
-  test("Validate that including things two steps away makes it so that there are 16 squares that aren't adjacent") {
-    val head: Coord = Coord(3, 3)
-
-    val tailCoords = for {
-      x <- 1 to 5
-      y <- 1 to 5
-    }  yield Coord(x, y)
-
-    val ropeGrids = tailCoords.map{ tailCoord =>
-      RopeGrid(head, tailCoord, Set(), RopeInstructions.empty)
-    }
-
-    val numGridsNotAdjacent: Int = ropeGrids.count(!_.isTailAdjacent)
-    val expectedNonAdjacentGrids = 16
-
-    assertEquals(numGridsNotAdjacent, expectedNonAdjacentGrids)
-  }
 
   test("Validated that the parsed grid has defaults") {
     val expectedHead = Coord(0, 0)
-    val expectedTail = Coord(0, 0)
-    val expectedVisited = Set(expectedTail)
+    val expectedTail = List(Coord(0, 0))
+    val expectedVisited = Set(Coord(0, 0))
     val expectedInstructions = RopeInstructions(List(
       RopeInstruction(Direction.R, 4),
       RopeInstruction(Direction.U, 4),
@@ -66,7 +32,7 @@ class RopeGridTest extends munit.FunSuite {
     ))
 
     assertEquals(TEST_ROPE_GRID.headCoord, expectedHead)
-    assertEquals(TEST_ROPE_GRID.tailCoord, expectedTail)
+    assertEquals(TEST_ROPE_GRID.knotsCoord, expectedTail)
     assertEquals(TEST_ROPE_GRID.tailVisited, expectedVisited)
     assertEquals(TEST_ROPE_GRID.ropeInstructions, expectedInstructions)
   }
@@ -92,6 +58,26 @@ class RopeGridTest extends munit.FunSuite {
     val updatedGrid = TEST_ROPE_GRID.incrementAllInstructions
     val numCoordsTailVisited = updatedGrid.numPlacesTailVisited
     val expectedCoordsVisited = 13
+
+    assertEquals(numCoordsTailVisited, expectedCoordsVisited)
+  }
+
+  test("Test the longer grid with a tail of 9 knots") {
+    val instructionInput = """R 5
+                             |U 8
+                             |L 8
+                             |D 3
+                             |R 17
+                             |D 10
+                             |L 25
+                             |U 20""".stripMargin
+      .split("\n").toList
+
+    val ropeGrid = RopeGrid.parseInput(instructionInput, 9)
+    val incrementAll = ropeGrid.incrementAllInstructions
+
+    val numCoordsTailVisited = incrementAll.numPlacesTailVisited
+    val expectedCoordsVisited = 36
 
     assertEquals(numCoordsTailVisited, expectedCoordsVisited)
   }

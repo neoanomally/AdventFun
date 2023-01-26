@@ -65,17 +65,34 @@ object Coord {
     }
   }
 
-  def incrementTail(headCoord: Coord, tailCoord: Coord): Coord = {
-    val shouldMoveDiagonal = Coord.isNotInRowOrColumn(headCoord, tailCoord)
+  def incrementTail(headCoord: Coord, tailKnots: List[Coord]): List[Coord] = {
+    val updatedKnots = tailKnots
+      .scanLeft(headCoord){case (leader, follower) =>
+        val isAdjacent = Coord.isTailAdjacent(leader, follower)
+
+        if (isAdjacent) {
+          follower
+        } else {
+          incrementFollowerKnot(leader, follower)
+        }
+      }.drop(1)
+
+
+    // TODO: This is a hack to get things to compile fix
+    updatedKnots
+  }
+
+  def incrementFollowerKnot(leaderKnot: Coord, followerKnot: Coord): Coord = {
+    val shouldMoveDiagonal = Coord.isNotInRowOrColumn(leaderKnot, followerKnot)
 
     if (shouldMoveDiagonal) {
-      moveDiagonalTowardsHead(headCoord, tailCoord)
-    } else if (shouldMoveX(headCoord, tailCoord)) {
-      val step = stepFromDirection(headCoord.x, tailCoord.x)
-      tailCoord.moveXForward(step)
+      moveDiagonalTowardsHead(leaderKnot, followerKnot)
+    } else if (shouldMoveX(leaderKnot, followerKnot)) {
+      val step = stepFromDirection(leaderKnot.x, followerKnot.x)
+      followerKnot.moveXForward(step)
     } else {
-      val step = stepFromDirection(headCoord.y, tailCoord.y)
-      tailCoord.moveYForward(step)
+      val step = stepFromDirection(leaderKnot.y, followerKnot.y)
+      followerKnot.moveYForward(step)
     }
   }
 

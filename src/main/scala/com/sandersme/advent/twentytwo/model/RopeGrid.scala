@@ -2,7 +2,8 @@ package com.sandersme.advent.twentytwo.model
 
 import com.sandersme.advent.twentytwo.model.Direction.negativeDirection
 
-case class RopeGrid(headCoord: Coord, tailCoord: Coord, tailVisited: Set[Coord],
+
+case class RopeGrid(headCoord: Coord, knotsCoord: List[Coord], tailVisited: Set[Coord],
                     ropeInstructions: RopeInstructions) {
 
   /**
@@ -17,27 +18,19 @@ case class RopeGrid(headCoord: Coord, tailCoord: Coord, tailVisited: Set[Coord],
     val moveInX = Direction.isMoveX(nextInstruction.direction)
     val stepMovement = nextInstruction.stepMovement
 
-    val default = (headCoord, List(tailCoord))
-    val (finalHead, tailRecs) = (0 until  nextInstruction.step)
-      .foldLeft(default){ case ((head, tail), _) =>
-        val tailHead = tail.head
+    val startOfFold = (headCoord, knotsCoord, tailVisited)
+
+    val (finalHead, finalTailKnots, updatedVisited) = (0 until  nextInstruction.step)
+      .foldLeft(startOfFold){ case ((head, tailKnots, visited), _) =>
+
         val updatedHead = Coord.updateCoordWithStep(head, moveInX, stepMovement)
+        val updatedTail: List[Coord] = Coord.incrementTail(updatedHead, tailKnots)
+        val updatedVisited = visited + updatedTail.last
 
-        val incrementedTail = if (Coord.isTailAdjacent(updatedHead, tailHead)) {
-          tailHead
-        } else {
-          Coord.incrementTail(updatedHead, tailHead)
-        }
-
-        val updatedTail: List[Coord] = incrementedTail +: tail
-
-        (updatedHead, updatedTail)
+        (updatedHead, updatedTail, updatedVisited)
       }
 
-    val currentTail = tailRecs.head
-    val updatedVisited: Set[Coord] = tailVisited ++ tailRecs
-
-    RopeGrid(finalHead, currentTail, updatedVisited, RopeInstructions(updatedInstructions))
+    RopeGrid(finalHead, finalTailKnots, updatedVisited, RopeInstructions(updatedInstructions))
   }
 
   def incrementAllInstructions: RopeGrid = {
@@ -46,20 +39,17 @@ case class RopeGrid(headCoord: Coord, tailCoord: Coord, tailVisited: Set[Coord],
     }
   }
 
-  def isTailAdjacent: Boolean = {
-    Coord.isTailAdjacent(headCoord, tailCoord)
-  }
-
   def numPlacesTailVisited: Int = tailVisited.size
 }
 
 object RopeGrid {
-  def parseInput(args: List[String]): RopeGrid = {
+  def parseInput(args: List[String], numKnots: Int = 1): RopeGrid = {
     val instructions = RopeInstructions.parseInstructions(args)
     val head = Coord(0, 0)
-    val tail = Coord(0, 0)
-    val tailVisited = Set(tail)
 
-    RopeGrid(head, tail, tailVisited, instructions)
+    val knots = List.fill(numKnots)(Coord(0, 0))
+    val tailVisited = Set(Coord(0,0))
+
+    RopeGrid(head, knots, tailVisited, instructions)
   }
 }

@@ -44,8 +44,17 @@ object RopeBridge {
      * it using the same rules as before.
      * Using the same series of motions as the above example, but with the knots marked H, 1, 2, ..., 9, the motions
      * now occur as follows:
+     *
+     * TODO: Instead of a head and one tail, we have a List and the tail is the end of the list. We keep track
+     * of the coordinates of 10 knots.
      */
 
+    val ropeGridPtTwo = RopeGrid.parseInput(input, 9)
+
+    val partTwoIncrementAllInstructions = ropeGridPtTwo.incrementAllInstructions
+    val numberOfLocationsTailVisitedPartTwo = partTwoIncrementAllInstructions.numPlacesTailVisited
+
+    println(s"The number of places that the tail visited with 9 knows was: ${numberOfLocationsTailVisitedPartTwo}")
   }
 
 }

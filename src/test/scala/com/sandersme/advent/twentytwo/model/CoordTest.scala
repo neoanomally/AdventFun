@@ -86,14 +86,14 @@ class CoordTest extends munit.FunSuite {
 
   test("Increment tail that should be a diagonal") {
     val headCoord = Coord(3, 3)
-    val tailCoordA = Coord(9, 9)
-    val tailCoordB = Coord(1, 1)
+    val tailCoordA = List(Coord(9, 9))
+    val tailCoordB = List(Coord(1, 1))
 
     val incrementedTailA = Coord.incrementTail(headCoord, tailCoordA)
     val incrementedTailB = Coord.incrementTail(headCoord, tailCoordB)
 
-    val expectedTailA = Coord(8, 8)
-    val expectedTailB = Coord(2, 2)
+    val expectedTailA = List(Coord(8, 8))
+    val expectedTailB = List(Coord(2, 2))
 
     assertEquals(incrementedTailA, expectedTailA)
     assertEquals(incrementedTailB, expectedTailB)
@@ -101,10 +101,10 @@ class CoordTest extends munit.FunSuite {
 
   test("Increment tail when it should be an X increment") {
     val headCoord = Coord(3, 3)
-    val tailCoord = Coord(5, 3)
+    val tailCoord = List(Coord(5, 3))
 
     val incrementTail = Coord.incrementTail(headCoord, tailCoord)
-    val expectedTail = Coord(4, 3)
+    val expectedTail = List(Coord(4, 3))
 
     assertEquals(incrementTail, expectedTail)
   }
