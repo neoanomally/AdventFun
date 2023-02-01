@@ -63,7 +63,12 @@ class CycleInstructionTest extends munit.FunSuite {
 
     val expectedSumSignalStrengths = 13140L
 
-
     assertEquals(sumOfSignalStrengths, expectedSumSignalStrengths)
+  }
+
+  test("Something") {
+    val largeCycleInstructions = CycleInstructions.parseInput(TestValues.CYCLE_LARGE_TEST_INPUT)
+    val processedInstructions = CycleInstructions.processInstructions(largeCycleInstructions)
+    CycleInstructions.generatePixelLocations(processedInstructions)
   }
 }

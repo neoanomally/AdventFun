@@ -49,6 +49,37 @@ object  CycleInstructions {
     accumulation.resultList
   }
 
+  def spriteLocationsFromX(x: Int): Set[Int] = {
+    Set(x - 1, x, x + 1)
+  }
+
+  /** as soon as an index would be updated to the width == 40; we need to set the index to 0 */
+  def updateHorizontalIndex(idx: Int): Int = {
+    if (idx == 39)
+      0
+    else
+      idx + 1
+  }
+
+  def generatePixelLocations(cycleValues: List[Int]): Unit = {
+    var horizontalIndex = 0
+
+    cycleValues.zipWithIndex.foreach{ case (value, idx) =>
+      val spriteLocation = spriteLocationsFromX(value)
+
+      if(spriteLocation.contains(horizontalIndex))
+        print("#")
+      else
+        print(".")
+
+
+      // Necessary Mutation effect could just have this as part of a fold Left update though
+      if(horizontalIndex == 39)
+        println()
+      horizontalIndex = updateHorizontalIndex(horizontalIndex)
+    }
+  }
+
   /**
    * This will take in previously processed cycle instructions. Every 20th value we take that index times the value
    * to get the signal strength at that index.

@@ -29,5 +29,10 @@ object CathodeRayTube {
       }.sum
 
     println(s"The signal strength of interesting signals is: ${sumOfSignalStrengths}")
+
+    val instructions = CycleInstructions.parseInput(input)
+    val processedInstructions = CycleInstructions.processInstructions(instructions)
+
+    CycleInstructions.generatePixelLocations(processedInstructions)
   }
 }
