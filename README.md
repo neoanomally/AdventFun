@@ -46,3 +46,6 @@ TODO: Add in 2022 into the README
 19. Day Nineteen: `sbt "runMain com.sandersme.advent.BeaconScanner"`
 20. Day Twenty:   `sbt "runMain com.sandersme.advent.TrenchMap"`
 21. Day TWentyOne:`sbt "runMain com.sandersme.advent.DiracDiceBoardGame"`
+
+
+## 2023
