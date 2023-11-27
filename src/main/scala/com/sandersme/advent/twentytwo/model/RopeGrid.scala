@@ -2,6 +2,8 @@ package com.sandersme.advent.twentytwo.model
 
 import com.sandersme.advent.twentytwo.model.Direction.negativeDirection
 
+import scala.collection.immutable.::
+
 
 case class RopeGrid(headCoord: Coord, knotsCoord: List[Coord], tailVisited: Set[Coord],
                     ropeInstructions: RopeInstructions) {
@@ -14,7 +16,9 @@ case class RopeGrid(headCoord: Coord, knotsCoord: List[Coord], tailVisited: Set[
    * @return
    */
   def incrementInstruction: RopeGrid = {
-    val nextInstruction::updatedInstructions = ropeInstructions.instructions
+    val nextInstruction = ropeInstructions.instructions.head
+    val updatedInstructions = ropeInstructions.instructions.tail
+
     val moveInX = Direction.isMoveX(nextInstruction.direction)
     val stepMovement = nextInstruction.stepMovement
 
