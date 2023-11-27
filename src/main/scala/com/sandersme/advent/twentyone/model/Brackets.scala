@@ -7,6 +7,7 @@ import scala.collection.mutable.Stack
 
 case class Brackets(values: List[Bracket]) // todo we will use some other datastructure
 
+/** TODO: Upgraded to 3.3.1 and had some issues with tests */
 object Brackets {
   case class BracketAccumulator(bracketStack: Stack[Bracket], stoppedBracket: Option[Bracket])
   case class CompletedErrorCodes(expectedBrackets: List[Bracket], score: Long)
