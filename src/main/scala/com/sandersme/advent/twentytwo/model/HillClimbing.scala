@@ -61,10 +61,6 @@ case class HillGrid(grid: Vector[Vector[Node]]) {
 object HillClimbing {
   import scala.util.Random
 
-  private val rand = new Random()
-  private val runtime = Runtime.getRuntime
-  import runtime.{totalMemory, freeMemory, maxMemory}
-
   def parseInput(input: List[String]): HillGrid = {
     val maxY = input.length
     val maxX = input.head.length
@@ -95,7 +91,7 @@ object HillClimbing {
   }
 
   /**
-   * Find all neighbors that aren't the current node and the node is valid.
+   * Find all neighborNodes that aren't the current node and the node is valid.
    * A valid node is where the x, y coordinates are > 0 and < maxValue.
    * @param location
    * @param maxLocation
@@ -117,38 +113,17 @@ object HillClimbing {
     results
   }
 
-  @throws
-  def findStartingNode(hillGrid: HillGrid): Node = {
-    val result = hillGrid.grid
-      .flatMap(_.find(_.isStartingNode))
-
-    if (result.size != 1)
-      throw new Exception("Error could not find starting node")
-
-    result.head
-  }
-
   def findShortestPathFromStart(hillGrid: HillGrid): Int = {
-    val startingNode = findStartingNode(hillGrid)
-    val finalMap = findShortestPathFromPoint(hillGrid, startingNode)
+    val startingNode = hillGrid.findStartingNode
+    val finalMap = findShortestPathFromPoint(hillGrid, startingNode, true)
 
-    finalMap(findDestinationNode(hillGrid).location)
+    finalMap(hillGrid.findEndingNode.location)
   }
 
   def findShortestAFromEndingNode(hillGrid: HillGrid): Int = {
-    val startingNode = findDestinationNode(hillGrid)
+    val startingNode = hillGrid.findEndingNode
 
-    val map = Map(startingNode.location -> 0)
-
-    val neighborsToVisit = startingNode
-      .neighbors
-      .map(hillGrid.getNode)
-      .filter(node => node.canMoveFrom(startingNode.value))
-      .map(_.location)
-
-    val visited = Set(startingNode.location)
-
-    val finalMap = programmingFromDestination(map, visited, hillGrid, startingNode, neighborsToVisit)
+    val finalMap = findShortestPathFromPoint(hillGrid, startingNode, false)
 
     finalMap
       .filter{ case (point, _) => hillGrid.getNode(point).value == 'a' }
@@ -156,23 +131,23 @@ object HillClimbing {
       .min
   }
 
-  def findShortestPathFromPoint(hillGrid: HillGrid, startingNode: Node): Map[HillPoint, Int] = {
+  def findShortestPathFromPoint(hillGrid: HillGrid, startingNode: Node, isFrom: Boolean)
+  : Map[HillPoint, Int] = {
     val map = Map(startingNode.location -> 0)
     val neighborsToVisit = startingNode
       .neighbors
       .map(hillGrid.getNode)
-      .filter(node => node.canMoveFrom(startingNode.value))
+      .filter(node => canMoveFn(node, startingNode.value, true))
       .map(_.location)
 
-    val visited = Set(startingNode.location)
-
-    val finalMap = programmingFromSource(map, visited, hillGrid, startingNode, neighborsToVisit)
+    val finalMap = programmingFromSource(map, hillGrid, neighborsToVisit, isFrom)
 
     printFinalGridAndDistances(hillGrid, finalMap)
 
     finalMap
   }
 
+  // This is a nice helper function that visualizes the graph.
   def printFinalGridAndDistances(hillGrid: HillGrid, finalMap: Map[HillPoint, Int]): Unit = {
     hillGrid.grid
       .foreach { v =>
@@ -200,184 +175,57 @@ object HillClimbing {
       }
   }
 
-  // TODO: Only uphill neighbors and downhill neighbors?
+  def canMoveFn(node: Node, char: Char, isFrom: Boolean): Boolean = {
+    if (isFrom) {
+      node.canMoveFrom(char)
+    } else {
+      node.canMoveTo(char)
+    }
+  }
 
   /**
    * This should only be called from another internal method.
-   * @param map
-   * @param visited
-   * @param hillGrid
-   * @param comingFrom
-   * @param toVisit
+   * @param map        This is used to hold not only which nodes we have visited but also how
+   *                   many steps each node is.
+   * @param hillGrid   This is the grid that holds our nested nodes.
+   * @param toVisit These are the nodes left to visit. THis is a queue where we visit each node
+   *                exactly once.
+   * @param isUphill This is to tell the moveFn which direction we need to check if a node can move
+   *               This is useful for going Uphill or down hill
    * @return
    */
   @tailrec
-  private def programmingFromSource(map: Map[HillPoint, Int], visited: Set[HillPoint],
-                                    hillGrid: HillGrid, comingFrom: Node,
-                                    toVisit: List[HillPoint]): Map[HillPoint, Int] = {
-
-
+  private def programmingFromSource(map: Map[HillPoint, Int], hillGrid: HillGrid,
+                                    toVisit: List[HillPoint],
+                                    isUphill: Boolean): Map[HillPoint, Int] = {
     if (toVisit.isEmpty) {
       map
     } else {
-      val current = toVisit.head
-      val currentNode = hillGrid.getNode(current)
+      val currentNode = hillGrid.getNode(toVisit.head)
 
-      val neighbors = currentNode
+      val neighborNodes = currentNode
         .neighbors
         .map(hillGrid.getNode)
 
-      val neighborsThatCouldVisitCurrent = neighbors
-        .filter(node => node.canMoveFrom(currentNode.value))
+      val neighborsThatCouldVisitCurrent = neighborNodes
+        .filter(node => canMoveFn(node, currentNode.value, isUphill))
         .map(_.location)
 
-      val visitableNeighbors = neighbors
-        .filter(node => currentNode.canMoveFrom(node.value))
+      val unvisitedNeighborsCanVisit = neighborNodes
+        .filter(node => canMoveFn(node, currentNode.value, !isUphill))
         .map(_.location)
-
-      val unvisitedNeighborsCanVisit = visitableNeighbors
-        .filterNot(visited.contains)
+        .filterNot(map.contains)
         .filterNot(toVisit.contains)
 
+      // We should always have at least one value given that the map is already prepopulated
       val distanceFromVisited = neighborsThatCouldVisitCurrent
         .flatMap(map.get).min + 1
 
-      val updatedMap = map + (current -> distanceFromVisited)
+      val updatedMap = map + (currentNode.location -> distanceFromVisited)
       val updatedToVisit =  toVisit.tail ++ unvisitedNeighborsCanVisit
-      val updatedVisited = visited + current
 
-      programmingFromSource(updatedMap, updatedVisited, hillGrid, currentNode, updatedToVisit)
+      programmingFromSource(updatedMap, hillGrid, updatedToVisit, isUphill)
     }
   }
 
-  // TODO: Clean this up we can merge the two together. The only difference is the function for
-  //  picking neighbors.
-  @tailrec
-  private def programmingFromDestination(map: Map[HillPoint, Int], visited: Set[HillPoint],
-                                    hillGrid: HillGrid, comingFrom: Node,
-                                    toVisit: List[HillPoint]): Map[HillPoint, Int] = {
-    if (toVisit.isEmpty) {
-      map
-    } else {
-      val current = toVisit.head
-      val currentNode = hillGrid.getNode(current)
-
-      val neighbors = currentNode
-        .neighbors
-        .map(hillGrid.getNode)
-
-      val neighborsThatCouldVisitCurrent = neighbors
-        .filter(node => node.canMoveTo(currentNode.value))
-        .map(_.location)
-
-      val visitableNeighbors = neighbors
-        .filter(node => currentNode.canMoveTo(node.value))
-        .map(_.location)
-
-      val unvisitedNeighborsCanVisit = visitableNeighbors
-        .filterNot(visited.contains)
-        .filterNot(toVisit.contains)
-
-      val distanceFromVisited = neighborsThatCouldVisitCurrent
-        .flatMap(map.get).min + 1
-
-      val updatedMap = map + (current -> distanceFromVisited)
-      val updatedToVisit = toVisit.tail ++ unvisitedNeighborsCanVisit
-      val updatedVisited = visited + current
-
-      programmingFromDestination(updatedMap, updatedVisited, hillGrid, currentNode, updatedToVisit)
-    }
-  }
-
-  @throws
-  def findDestinationNode(hillGrid: HillGrid): Node = {
-    val result = hillGrid.grid
-      .flatMap(_.find(_.isDestinationNode))
-
-    if (result.size != 1)
-      throw new Exception("Error could not find starting node")
-
-    result.head
-  }
-
-
-
-  /**
-   * First find the starting node. Then either do a DFS or BFS to find the shortest path through
-   * the
-   * @param hillGrid
-   * @return
-   */
-
-  /// TODO: Start from the destination node then find all the neighbros steps
-  def findShortestPath(hillGrid: HillGrid): Int = {
-    val startingNode = findStartingNode(hillGrid)
-    val destinationNode = findDestinationNode(hillGrid)
-    val startingMap = Map(destinationNode.location -> 0)
-
-    val f = recursePaths(hillGrid, startingNode, Set(startingNode.location), startingMap)
-
-    f(startingNode.location)
-  }
-
-  def debugInfo(currentNode: Node, stepsMap: Map[HillPoint, Int]): Unit = {
-    if (rand.nextInt(1000000) % 1000000 == 0) {
-      val totalGB = totalMemory() / 1024 / 1024
-      val memoryGB = freeMemory() / 1024 / 1024
-      val percentageString = (memoryGB.toDouble / totalGB.toDouble).formatted("%.4f")
-      println(s"At node: ${currentNode}")
-      println(s"Free memory MB = ${memoryGB}\t using Approx: ${percentageString}")
-      println(stepsMap)
-    }
-
-  }
-
-  // TODO: Dynamic programming to start backwards from
-  // TODO: In order to have tail recursion we need a better way to loop that
-  // TODO: Memoization Steps to E from node. Find E from each Node and calculate
-  // keeps track of current and previous states.
-  def recursePaths(hillGrid: HillGrid, currentNode: Node, visited: Set[HillPoint],
-                   stepsMap: Map[HillPoint, Int]): Map[HillPoint, Int] = {
-
-    // debugInfo(currentNode, stepsMap)
-
-    val neighborsToVisit = currentNode.neighbors
-      .filterNot(visited.contains)
-      .filter { point =>
-        val node = hillGrid.getNode(point)
-        currentNode.canMoveFrom(node.value)
-      }
-
-    if (neighborsToVisit.isEmpty) {
-      // TODO; this is probably not the best way to handle this. Verify
-      stepsMap
-    } else {
-      val accumulatorStart = (Integer.MAX_VALUE, stepsMap)
-      // Return steps + mappity... This could probably be it's own function.
-      val (steps, foldedMap) = neighborsToVisit
-        .foldLeft(accumulatorStart) { case ((minSteps, mappity), next) =>
-          if (mappity.contains(next)) {
-            val stepsToDestination = Math.min(mappity(next) + 1, minSteps)
-            (stepsToDestination, mappity)
-          } else {
-            val updatedVisited = visited + next
-            val nextNode = hillGrid.getNode(next)
-            val updatedMap = recursePaths(hillGrid, nextNode, updatedVisited, mappity)
-            val valueOrMax = updatedMap.getOrElse(next, Integer.MAX_VALUE - 1)
-
-            val stepsToDestination = Math.min(valueOrMax + 1, minSteps)
-
-            (stepsToDestination, updatedMap)
-          }
-      }
-
-      val finalMap = if (steps == Integer.MAX_VALUE) {
-        foldedMap
-      } else {
-        foldedMap ++ Map(currentNode.location -> (steps))
-      }
-
-      finalMap
-    }
-  }
 }
