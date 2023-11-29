@@ -4,3 +4,4 @@
 /project/target/
 /.metals/
 .secrets
+/rust-AdventFun/target/
