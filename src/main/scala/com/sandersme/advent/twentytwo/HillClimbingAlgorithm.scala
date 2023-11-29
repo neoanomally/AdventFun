@@ -10,10 +10,13 @@ object HillClimbingAlgorithm {
 
     val hillGrid = HillClimbing.parseInput(inputData)
 
-    val shortestPath = HillClimbing.findShortestPath(hillGrid)
+    val shortestPath = HillClimbing.findShortestPathFromStart(hillGrid)
 
     println(s"Shortest Path: ${shortestPath}")
 
+
+    val shortestPathFromEndToA = HillClimbing.findShortestAFromEndingNode(hillGrid)
+    println(s"Part Two: Programming from Ending Node Path: ${shortestPathFromEndToA}")
   }
 
 }
