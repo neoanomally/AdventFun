@@ -16,6 +16,7 @@ object CubeConundrum {
       CubeColor.green -> 13
     ))
 
+     
     val sumOfPossibleCubes = Cube.sumIdsOfPossibleGames(games, bagCubeContents)
 
     println(s" The sum of all possible game cube IDs: ${sumOfPossibleCubes}")
