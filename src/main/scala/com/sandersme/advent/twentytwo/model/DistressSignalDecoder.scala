@@ -18,7 +18,35 @@ case class Packet(startingNode: PacketType)
 
 
 case class PacketPair(left: PacketType, right: PacketType) {
-  def isCorrectOrder: Boolean = ???
+  def isCorrectOrder: Boolean = {
+    val leftValues = left.findValuesInOrder
+    val rightValues = right.findValuesInOrder
+
+    val isCorrectDepth = if (leftValues.isEmpty && rightValues.isEmpty) {
+      left.countDepth <= right.countDepth
+    } else {
+      true
+    }
+
+    def loop(leftList: List[Int], rightList: List[Int]): Boolean = {
+      val bothOrRightEmpty = (leftList.isEmpty && rightList.isEmpty) || leftList.isEmpty
+
+      if (bothOrRightEmpty) {
+        true
+      } else if (rightList.isEmpty) {
+        false
+      } else if(leftList.head > rightList.head) {
+        false
+      } else if (leftList.head < rightList.head) {
+        true
+      } else {
+        loop(leftList.tail, rightList.tail)
+      }
+    }
+
+    loop(leftValues, rightValues) && isCorrectDepth
+  }
+
 
   override
   def toString: String = s"Left:\t${left}\nRight:\t${right}"
@@ -44,33 +72,28 @@ object PacketType {
     startParsing(input.toList, List.empty)
   }
 
+  // GET TO TRY OUT SOME COOL EXTENSION METHODS on sealed traits
+  extension (packetType: PacketType) {
+    def findValuesInOrder: List[Int] = {
+      packetType match {
+        case PacketList(values) => values.flatMap(_.findValuesInOrder)
+        case PacketValue(value) => List(value)
+        case PacketTerminator => List.empty
+      }
+    }
+    def countDepth: Int = {
+      packetType match {
+        case PacketList(values) => 1 + values.map(_.countDepth).sum
+        case PacketValue(value) => 0
+        case PacketTerminator => 0
+      }
+    }
+  }
+
+
    def startParsing(input: List[Char], accumulation: List[PacketType]): PacketType = {
-     val results = findClosingBracket(input.toList, List.empty, List.empty)
-//
-//     if (remaining.isEmpty) {
-//       println(s"RESULTS: ${results}")
-//       val v = results match {
-//         case PacketList(value) => value
-//         case _ => throw new Exception("")
-//       }
-//
-//       println(s"V: ${v}")
-//       val preach = accumulation.head match {
-//         case PacketList(value) => value ++ v
-//       }
-//
-//       println(s"Preach: ${preach}")
-//
-//       PacketList(preach)
-//     } else {
-//       val updatedAccumulation = results match {
-//         case PacketList(value) => accumulation ++ value
-//         case _ => throw new Exception("OUTER LAYER SHOULD ALWAYS BE A LIST")
-//       }
-//       startParsing(remaining, updatedAccumulation)
-//     }
-    results
- }
+     findClosingBracket(input.toList, List.empty, List.empty)
+   }
 
   // Alternatively we have an accumulator and a result which is actually what we should
   // be doing anyways: , results: PacketType,
@@ -83,6 +106,7 @@ object PacketType {
         case Some('[') =>
             findClosingBracket(input.tail, List.empty, packetAccumulation ++ result)
         case Some(']') =>
+          println(s"REmaining left ${input.size}: ${input}")
           val packet = PacketList(packetAccumulation)
           if (input.tail.isEmpty && result.isEmpty) { // terminating case inside a nest
             packet
@@ -97,7 +121,7 @@ object PacketType {
         case Some(',') =>
           findClosingBracket(input.tail, packetAccumulation, result)
 
-        case _ => // Should be numeric
+        case n => // Should be numeric
           val int = input
            .takeWhile(value => value != '[' && value != ']' && value != ',')
 
@@ -111,7 +135,15 @@ object PacketType {
 }
 
 case class DistressSignalDecoder(packetPairs: List[PacketPair]) {
-  def sumOfCorrectOrderIndicies: Int = ???
+  def sumOfCorrectOrderIndicies: Int = findIndiciesCorrectOrder.sum
+
+  def findIndiciesCorrectOrder: List[Int] = {
+    packetPairs
+      .map(_.isCorrectOrder)
+      .zipWithIndex
+      .filter(_._1)
+      .map(_._2 + 1)
+  }
 }
 object DistressSignalDecoder {
   def parseInput(input: List[String]): DistressSignalDecoder = {
