@@ -9,6 +9,7 @@ object Input {
     val path = s"data/${directory}/${filename}"
     val file = Source.fromResource(path, Input.getClass.getClassLoader)
     val lines = file.getLines().toList
+    
     file.close()
     lines
   }

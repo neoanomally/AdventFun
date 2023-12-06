@@ -1,6 +1,8 @@
 /.idea/
 /.bsp/
 /target/
+.bloop
+/project
 /project/project/
 /project/target/
 /.metals/
