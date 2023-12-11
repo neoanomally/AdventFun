@@ -106,7 +106,7 @@ object PacketType {
         case Some('[') =>
             findClosingBracket(input.tail, List.empty, packetAccumulation ++ result)
         case Some(']') =>
-          println(s"REmaining left ${input.size}: ${input}")
+          // println(s"REmaining left ${input.size}: ${input}")
           val packet = PacketList(packetAccumulation)
           if (input.tail.isEmpty && result.isEmpty) { // terminating case inside a nest
             packet
