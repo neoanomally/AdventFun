@@ -167,6 +167,6 @@ class DistressSignalDecoderTest extends munit.FunSuite {
     val input = "[[4,[1,[]]],[8,3,[[0,2],[5,2,6],[7,0,10,0],2,[5,7,10,2]],[[5,9],5,10,[9,7,7]]]]"
     val packet = PacketType.parse(input)
 
-    println(packet)
+    // println(packet)
   }
 }

@@ -128,7 +128,7 @@ class MonkeyTest extends munit.FunSuite {
     val updatedMonkies = Monkey.iterateMonkeyInTheMiddleNTimes(testMonkeis, 20, 3)
 
     // TODO Write an assertion,
-    updatedMonkies.foreach(println)
+    // updatedMonkies.foreach(println)
   }
 
   test("Multiply the top two busiest monkeies should equal 10605") {
@@ -146,7 +146,7 @@ class MonkeyTest extends munit.FunSuite {
     val worryDecreaseFactor: Long
     = Monkey.calculateLeastCommonMultiple(testMonkeis)
 
-    println(worryDecreaseFactor)
+    // println(worryDecreaseFactor)
 
     val updatedMonkies = Monkey
       .iterateMonkeyInTheMiddleNTimes(testMonkeis, 10000, worryDecreaseFactor.intValue)

@@ -114,6 +114,6 @@ class TreeGridTest extends munit.FunSuite {
   }
 
   test("Print visibility of each tree".ignore) {
-    TEST_TREE_GRID.printVisibility
+    // TEST_TREE_GRID.printVisibility
   }
 }

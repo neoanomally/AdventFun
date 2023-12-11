@@ -142,7 +142,7 @@ object HillClimbing {
 
     val finalMap = programmingFromSource(map, hillGrid, neighborsToVisit, isFrom)
 
-    printFinalGridAndDistances(hillGrid, finalMap)
+    // printFinalGridAndDistances(hillGrid, finalMap)
 
     finalMap
   }
