@@ -26,6 +26,10 @@ object Input {
     readFromDataResource("twentythree", filename)
   }
 
+  def readTwentyFourFromResource(filename: String): List[String] = {
+    readFromDataResource("twentyfour", filename)
+  }
+
   // TODO MOve this somewhere else
   def parseDay2Input(line: String): PilotCommand = {
 
