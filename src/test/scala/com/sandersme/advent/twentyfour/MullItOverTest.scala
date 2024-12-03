@@ -6,8 +6,7 @@ class MullItOverTest extends munit.FunSuite {
     
     val sum = processor.sum
 
-    val expectedSum = 161
-
+    val expectedSum = 48
     assertEquals(sum, expectedSum)
   }
 
@@ -20,5 +19,5 @@ class MullItOverTest extends munit.FunSuite {
   //
   //          once fully found add the two integers to an object
 
-  val TEST_INPUT = "xmul(2,4)%&mul[3,7]!@^do_not_mul(5,5)+mul(32,64]then(mul(11,8)mul(8,5))"
+  val TEST_INPUT = "xmul(2,4)&mul[3,7]!^don't()_mul(5,5)+mul(32,64](mul(11,8)undo()?mul(8,5))" 
 }
