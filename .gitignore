@@ -8,3 +8,6 @@
 /.metals/
 .secrets
 /rust-AdventFun/target/
+.git-credentials
+src/main/scala/com/sandersme/advent/twentyfour/Reports.scala
+/local-tests/

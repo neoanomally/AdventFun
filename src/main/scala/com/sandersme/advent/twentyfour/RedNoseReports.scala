@@ -8,14 +8,18 @@ object RedNoseReports {
 
     val parsedInput = input.map(parseLine)
 
-    val safeLines = parsedInput.map(line => isLineSafe(line))
-    val numSafe = countSafe(safeLines)
+    // val safeLines = parsedInput.map(line => isLineSafe(line))
+    // val numSafe = countSafe(safeLines)
 
-    val safeLinesWithRemoval = parsedInput.map(line => isLineSafe(line, isIgnored = true) || isLineSafe(line.tail))
+    val safeLinesWithRemoval = parsedInput.map{line => 
+      val res = isLineSafe(line, isIgnored = true) || isLineSafe(line.tail, isIgnored = false)
+      res
+    }
     val numSafeWithRemoval = countSafe(safeLinesWithRemoval)
     
-    println(f"The number of safe Lines: $numSafe")
-    println(f"The number of safe lines with one removal: $numSafeWithRemoval")
+    print(f"Num Safe: $numSafeWithRemoval")
+    // println(f"The number of safe Lines: $numSafe")
+    // println(f"The number of safe lines with one removal: $numSafeWithRemoval")
   }
 
 
@@ -26,21 +30,24 @@ object RedNoseReports {
       .toList
   }
 
-  def isLineSafe(line: List[Int], idx: Int = 1, isPositive: Boolean = true, isIgnored: Boolean = false): Boolean = {
-    val direction = if (idx != 1) isPositive else line(idx - 1) - line(idx) > 0
+  def isLineSafe(line: List[Int], idx: Int = 0, isPositive: Boolean = true, isIgnored: Boolean = false): Boolean = {
+    val direction = if (idx != 0) isPositive else line(idx) - line(idx + 1) > 0
     
-    if (idx >= line.length || (idx == line.length - 1 && isIgnored)) {
+    if (idx >= line.length - 1) {
+      // println(f"Solution for $line")
       true
-    } else if (isSafe(line(idx - 1), line(idx), direction)) {
-      isLineSafe(line, idx + 1, direction, isIgnored = isIgnored)
+    } else if (isSafe(line(idx), line(idx + 1), direction)) {
+      isLineSafe(line, idx + 1, direction, isIgnored)
     } else if (isIgnored) {
-      val updatedLine = line.drop(idx - 1)
-      val otherUpdated = line.drop(idx)
+      val updatedLine = line.patch(idx, Nil, 1)
+      val alternateRemoval = line.patch(idx + 1, Nil, 1)
+      // println(f"Dropping ${line(idx)} at idx: $idx new line: $updatedLine")
       // println(f"Droping ${line(idx - 1)} from $line which is idx: ${idx - 1}")
       // println(f"Droping ${line(idx)} from $line which is idx: ${idx}")
-
-      isLineSafe(updatedLine, idx, direction, isIgnored = false) || isLineSafe(otherUpdated, idx, direction, isIgnored = false)
+      val nextIdx = if (idx == 0) 0 else idx - 1
+      isLineSafe(updatedLine, nextIdx, direction, false) || isLineSafe(alternateRemoval, idx, direction, false) 
     } else {
+      // println(f"NO SOLUTION: $line")
       false
     }
   }
