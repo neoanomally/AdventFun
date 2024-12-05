@@ -30,6 +30,32 @@ case class CareGrid(data: List[List[Char]]) {
 
   }
 
+  def countAllXmas: Int = {
+    val xmases = for {
+      x <- 1 until height - 1
+      y <- 1 until width - 1
+      point = Point(x, y)
+
+      if(charAt(point) == 'A')
+    } yield containsXMas(point)
+
+    xmases.count(identity)
+  }
+
+  def containsXMas(point: Point): Boolean = {
+    val diag1 = Set(
+      charAt(Point(point.x - 1, point.y - 1)),
+      charAt(Point(point.x + 1, point.y + 1))
+    )
+
+    val diag2 = Set(
+      charAt(Point(point.x + 1, point.y - 1)),
+      charAt(Point(point.x - 1, point.y + 1))
+    )
+
+    diag1.contains('M') && diag1.contains('S') && diag2.contains('M') && diag2.contains('S')
+  }
+
   def countAllStraightLineOccurrences(word: String): Int = {
     val occurrences = for {
       x <- 0 until height
@@ -110,7 +136,10 @@ object CaresSearch {
 
     val sum = grid.countAllStraightLineOccurrences("XMAS")
 
+    val xmasSum = grid.countAllXmas
+
     println(f"THe number of XMAS occurrences is: $sum")
+    println(f"The number of X-MASes is: $xmasSum")
   }
 
 }

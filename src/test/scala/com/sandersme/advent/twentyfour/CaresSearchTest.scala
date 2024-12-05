@@ -49,6 +49,13 @@ class CaresSearchTest extends munit.FunSuite {
   }
 
 
+  test("Count all xmases should equal 9") {
+    val sum = TEST_GRID.countAllXmas
+
+    assertEquals(sum, 9)
+  }
+
+
  /// ADDED AN Additional row to check some height differences
   val TEST_INPUT: List[String] = """MMMSXXMASM
       MSAMXMSMSA
