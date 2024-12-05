@@ -20,11 +20,6 @@ class PipeGraphTest extends munit.FunSuite {
     // Just for troubleshooting and visualization
     val pipeGraph = PipeGraph.parseInput(TEST_INPUT)
 
-    pipeGraph.pipes.foreach{ pipe => 
-      pipe.foreach(print )
-      println("")
-    }
-    println("")
     pipeGraph.printMainLoopWithInnerOuter
   }
 

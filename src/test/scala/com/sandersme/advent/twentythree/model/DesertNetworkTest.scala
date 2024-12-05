@@ -93,7 +93,6 @@ class DesertNetworkTest extends munit.FunSuite {
   test("validate that we can traverse the ghost network in six steps") {
     val expectedResult = 6L
     val cyclesFrorNode = GHOST_NETWORK.findCyclesAndExitPoints
-    println(s"CYCLES: ${cyclesFrorNode}")
     val results = GHOST_NETWORK.calculateStepsFromCycles
 
     assertEquals(results, expectedResult)

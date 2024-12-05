@@ -85,8 +85,4 @@ class HotSpringDiagnosticsTest extends munit.FunSuite {
     assertEquals(unfolded, expectedUnfolded)
   }
 
-
-  test("Test something new") {
-    println("hello world")
-  }
 }

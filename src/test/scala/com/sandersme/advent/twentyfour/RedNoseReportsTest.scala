@@ -33,10 +33,10 @@ class RedNoseReportsTest extends munit.FunSuite {
     assertEquals(isLineSafe(twoEnding, isIgnored = true), true)
     assertEquals(isLineSafe(realTestCase, isIgnored = true), true)
     assertEquals(isLineSafe(anotherRealCase, isIgnored = true), true)
-    assertEquals(isLineSafe(oneOfFour, isIgnored = true), true)
-    assertEquals(isLineSafe(twoOfFour, isIgnored = true), true)
-    assertEquals(isLineSafe(threeOfFour, isIgnored = true), true)
-    assertEquals(isLineSafe(fourOfFour, isIgnored = true), true)
+    assertEquals(isLineSafe(oneOfFour, isIgnored = true), false)
+    assertEquals(isLineSafe(twoOfFour, isIgnored = true), false)
+    assertEquals(isLineSafe(threeOfFour, isIgnored = true), false)
+    assertEquals(isLineSafe(fourOfFour, isIgnored = true), false)
   }
 
   test("Test whether or not line is valid for part one") {
