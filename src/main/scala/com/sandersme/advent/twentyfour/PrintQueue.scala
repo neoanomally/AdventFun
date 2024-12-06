@@ -7,7 +7,7 @@ case class PrintQueue(dependencies: Map[Int, Set[Int]], updates: List[List[Int]]
 
   def sumNotChanged: Int = {
     updates
-      .filter(input => isIdentical(input, sortUpdate(input)))
+      .filter(input => PrintQueue.isIdentical(input, sortUpdate(input)))
       .map(update => update(update.length / 2))
       .sum
   }
@@ -15,24 +15,14 @@ case class PrintQueue(dependencies: Map[Int, Set[Int]], updates: List[List[Int]]
   def sumChanged: Int = {
     updates
       .map(original => (original, sortUpdate(original)))
-      .filter{ case (original, updated) => !isIdentical(original, updated) }
+      .filter{ case (original, updated) => !PrintQueue.isIdentical(original, updated) }
       .map { case (original, updated) => updated }
       .map(update => update(update.length / 2))
       .sum
   }
 
-  @tailrec
-  private def isIdentical(left: List[Int], right: List[Int], idx: Int = 0): Boolean = {
-    if (idx == left.length) {
-      true
-    } else if (left(idx) == right(idx)) {
-      isIdentical(left, right, idx + 1)
-    } else {
-      false
-    }
-  }
 
-  private[this] def sortUpdate(in: List[Int]): List[Int] = {
+  private[twentyfour] def sortUpdate(in: List[Int]): List[Int] = {
     in.sortWith { case (left, right) =>
       if (dependencies.contains(left) && dependencies(left).contains(right)) {
         true
@@ -61,6 +51,16 @@ object PrintQueue {
     PrintQueue(dependenciesMap, instructions)
   }
 
+  @tailrec
+  private[twentyfour] def isIdentical(left: List[Int], right: List[Int], idx: Int = 0): Boolean = {
+    if (idx == left.length) {
+      true
+    } else if (left(idx) == right(idx)) {
+      isIdentical(left, right, idx + 1)
+    } else {
+      false
+    }
+  }
 
   def main(args: Array[String]): Unit = {
     val input = Input.readTwentyFourFromResource("day5_input")

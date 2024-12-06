@@ -13,6 +13,18 @@ class PrintQueueTest extends  munit.FunSuite {
     assertEquals(sum, 143)
   }
   
+  test("Validate that we can sort the value using custom sorter.") {
+    TEST_QUEUE.sortUpdate(TEST_QUEUE.updates(4))
+  }
+
+  test("Validate two lists with different elements pass") {
+    val first = List(1, 2, 3, 4, 5)
+    val second = List(5, 4, 3, 2, 1)
+    val checkDifferentFalse = PrintQueue.isIdentical(first, second)
+    val checkDifferentTrue = PrintQueue.isIdentical(first, first)
+    assertEquals(checkDifferentFalse, false)
+    assertEquals(checkDifferentTrue, true)
+  }
 
   val TEST_INPUT = """47|53
       97|13
