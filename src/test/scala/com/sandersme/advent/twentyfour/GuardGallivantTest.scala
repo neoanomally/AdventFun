@@ -54,8 +54,10 @@ class GuardGallivantTest extends munit.FunSuite {
     assertEquals(finalGuard.visitedPoints.size, 41) 
   }
   
-  test("Count the number of loops to add obstacles to".ignore) {
+  test("Count the number of loops to add obstacles to") {
     val finalGuard = GuardGallivant.moveGuardTillOffboard(TEST_GUARD_GRID)
+    // VIsited should only be the following: 
+    // Point(3, 6)[X], Point(6, 7)[ ], Point(7, 7) [ ], Point(1, 8)[X], Point(3, 8)[X], Point(7, 9)[X]
 
     val numLoops = finalGuard.countNumLoops
 

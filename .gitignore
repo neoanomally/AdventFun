@@ -11,3 +11,4 @@
 .git-credentials
 src/main/scala/com/sandersme/advent/twentyfour/Reports.scala
 /local-tests/
+/src/main/resources/data/
