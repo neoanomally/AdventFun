@@ -3,6 +3,7 @@ package com.sandersme.advent.twentyfour
 import java.security.Guard
 import com.sandersme.advent.Input
 import com.sandersme.advent.twentytwo.model.CommDecoder.loopIncrementCharacters
+import com.sandersme.advent.twentytwo.model.Direction
 
 
 enum Direction {
@@ -13,43 +14,49 @@ enum PosType {
   case Obstacle, Guard, Empty
 }
 
+case class Line(start: Point, end: Point, direction: Direction) 
 
 case class GuardGallivant(rows: Map[Int, List[Int]], cols: Map[Int, List[Int]], height: Int,
-  width: Int, guard: Point, direction: Direction, visitedPoints: Set[Point], start: Point) {
+  width: Int, guard: Point, direction: Direction, visitedPoints: Set[Point], lines: Set[Line], start: Point) {
     val OFFBOARD_POINT = Point(-1, -1)
     val CONTAINS_LOOP_POINT = Point(-2, -2)
 
     def moveGuard: GuardGallivant = {
-      val pointsTraveled: Seq[Point] = direction match {
+      val (pointsTraveled: Seq[Point], endPoint: Option[Point]) = direction match {
         case Direction.Up => {
           val startY = cols.getOrElse(guard.x, List.empty).findLast(_ < guard.y).getOrElse(-1)
 
-          GuardGallivant.generatePoints(guard.x, guard.x + 1, startY + 1, guard.y)
-            .reverse
+          val points = GuardGallivant.generatePoints(guard.x, guard.x + 1, startY + 1, guard.y)
+          (points, points.headOption)
         }
         case Direction.Right => {
           val endX = rows.getOrElse(guard.y, List.empty).find(_ > guard.x).getOrElse(width)
 
-          GuardGallivant.generatePoints(guard.x, endX, guard.y, guard.y + 1)
+          val points =GuardGallivant.generatePoints(guard.x, endX, guard.y, guard.y + 1)
+          (points, points.lastOption)
         }
         case Direction.Down => {
           val endY = cols.getOrElse(guard.x, List.empty).find(_ > guard.y).getOrElse(height)
 
-          GuardGallivant.generatePoints(guard.x, guard.x + 1, guard.y, endY)
+          val points = GuardGallivant.generatePoints(guard.x, guard.x + 1, guard.y, endY)
+          (points, points.lastOption)
         }
         case Direction.Left => {
           val startX = rows.getOrElse(guard.y, List.empty).findLast(_ < guard.x).getOrElse(-1)
-          
-          GuardGallivant.generatePoints(startX + 1, guard.x, guard.y, guard.y + 1)
-            .reverse
+         
+          val points = GuardGallivant.generatePoints(startX + 1, guard.x, guard.y, guard.y + 1)
+          (points, points.headOption)
         }
       }
 
-      val guardEnd = pointsTraveled.lastOption
+      val line = Line(guard, endPoint.getOrElse(guard), direction)
+
+      val guardEnd = endPoint
         .map{ case endPosition => 
           if (endPosition.x == 0 || endPosition.y == 0 || endPosition.x == width - 1 || endPosition.y == height - 1) {
             OFFBOARD_POINT 
-          } else if (containsLoop(pointsTraveled)) {
+          } else if (lines.contains(line)) {
+            println(line)
             CONTAINS_LOOP_POINT
           }else { 
             endPosition 
@@ -65,7 +72,7 @@ case class GuardGallivant(rows: Map[Int, List[Int]], cols: Map[Int, List[Int]], 
 
       val updatedVisited = visitedPoints ++ pointsTraveled
     
-      this.copy(visitedPoints = updatedVisited, direction = nextDirection, guard = guardEnd)
+      this.copy(visitedPoints = updatedVisited, direction = nextDirection, guard = guardEnd, lines = lines + line)
     }
 
     /* 
@@ -74,21 +81,15 @@ case class GuardGallivant(rows: Map[Int, List[Int]], cols: Map[Int, List[Int]], 
      * if it does create a loop then I can sum by truthy
      * */
     def countNumLoops: Int = { 
-      GuardGallivant.printVisited(this)
-      
       visitedPoints
         .filter(_ != start)
         .count { point => 
-          val updatedRows = rows + ((point.y, rows.getOrElse(point.y, List.empty) :+ point.x))
-          val updatedCols = cols + ((point.x, cols.getOrElse(point.x, List.empty) :+ point.y))
-          val guardGallivant = this.copy(rows = updatedRows, cols = updatedCols, guard = start, visitedPoints = Set(start), direction = Direction.Up)
+          val updatedRows = rows + ((point.y, (rows.getOrElse(point.y, List.empty) :+ point.x).sorted))
+          val updatedCols = cols + ((point.x, (cols.getOrElse(point.x, List.empty) :+ point.y).sorted))
+          val guardGallivant = this.copy(rows = updatedRows, cols = updatedCols,
+            guard = start, visitedPoints = Set(start), direction = Direction.Up, lines = Set.empty)
 
           val updatedGuard = GuardGallivant.moveGuardTillOffboard(guardGallivant)
-          if (updatedGuard.hasLoop) {
-            println("ADDED: " + point)
-            println("\n\n")
-            GuardGallivant.printVisited(updatedGuard)
-          }
           updatedGuard.hasLoop
         }
     }
@@ -98,9 +99,6 @@ case class GuardGallivant(rows: Map[Int, List[Int]], cols: Map[Int, List[Int]], 
     def offBoard: Boolean = guard == OFFBOARD_POINT
     def hasLoop: Boolean = guard == CONTAINS_LOOP_POINT
 
-    def containsLoop(lastTravelled: Seq[Point]): Boolean = {
-      !lastTravelled.exists(point => !visitedPoints.contains(point))
-    }
   }
 
 
@@ -134,10 +132,16 @@ object GuardGallivant {
     val moved = GuardGallivant.moveGuardTillOffboard(guardGallivant)
     val timeStop = System.currentTimeMillis()
 
-    println("Time to process grid: " + (timeStop - timeStart) * (moved.visitedPoints.size))
+    println("Time to process grid: " + (timeStop - timeStart))
     println("Final size of the visited Spaces Equals: " + moved.visitedPoints.size)
     println("Size of grid: " + (guardGallivant.height * guardGallivant.width)) 
 
+    val timeStartObstacles = System.currentTimeMillis
+    val numObstaclesLoops = moved.countNumLoops
+    val totalTimeObstacles = System.currentTimeMillis() - timeStartObstacles
+
+    println(f"Total time to process grid part 2: $totalTimeObstacles")
+    println(f"Total Num Obstacles that create Loops: $numObstaclesLoops")
   }
 
 
@@ -149,7 +153,8 @@ object GuardGallivant {
      (0 until guard.width).foreach { y => 
       (0 until guard.height).foreach{ x =>
         if (guard.visitedPoints.contains(Point(x, y))) {
-          print("^");
+          // print("^");
+          print(".")
          } else if (obstacles.contains(Point(x, y))) {
           print("#")
          } else
@@ -157,7 +162,7 @@ object GuardGallivant {
         }
         println("")
       }
-    }
+  }
 
   def parseInput(in: List[String]): GuardGallivant = {
     val height = in.length
@@ -193,7 +198,7 @@ object GuardGallivant {
     }
 
     val guardPos = Point(guard._1, guard._2)
-    GuardGallivant(rows, cols, height, width, guardPos, Direction.Up, Set(guardPos), guardPos)
+    GuardGallivant(rows, cols, height, width, guardPos, Direction.Up, Set(guardPos), Set.empty, guardPos)
   }
   
 }
