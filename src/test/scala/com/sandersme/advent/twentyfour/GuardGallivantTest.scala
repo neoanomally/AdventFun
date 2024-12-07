@@ -19,7 +19,7 @@ class GuardGallivantTest extends munit.FunSuite {
   }
 
   test("Validate that the guard starts on the grid.") {
-    assertEquals(TEST_GUARD_GRID.isOffboard, false)
+    assertEquals(TEST_GUARD_GRID.isFinished, false)
   }
 
   test("TEST THE HEIGHT AND WIDTH") {
@@ -52,6 +52,14 @@ class GuardGallivantTest extends munit.FunSuite {
 
     assertEquals(finalGuard.guard, Point(-1, -1))
     assertEquals(finalGuard.visitedPoints.size, 41) 
+  }
+  
+  test("Count the number of loops to add obstacles to".ignore) {
+    val finalGuard = GuardGallivant.moveGuardTillOffboard(TEST_GUARD_GRID)
+
+    val numLoops = finalGuard.countNumLoops
+
+    assertEquals(numLoops, 6)
   }
 
   val TEST_INPUT = """....#.....
