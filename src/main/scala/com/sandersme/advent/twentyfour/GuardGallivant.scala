@@ -56,12 +56,11 @@ case class GuardGallivant(rows: Map[Int, List[Int]], cols: Map[Int, List[Int]], 
           if (endPosition.x == 0 || endPosition.y == 0 || endPosition.x == width - 1 || endPosition.y == height - 1) {
             OFFBOARD_POINT 
           } else if (lines.contains(line)) {
-            println(line)
             CONTAINS_LOOP_POINT
           }else { 
             endPosition 
           } 
-        }.getOrElse(OFFBOARD_POINT)
+        }.getOrElse(guard)
 
       val nextDirection = direction match {
         case Direction.Up => Direction.Right
