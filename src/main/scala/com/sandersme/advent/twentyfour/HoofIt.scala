@@ -99,6 +99,11 @@ object  HoofIt {
 
     val grid = HoofIt.parseInput(input)
     println("Sum of traversing Grid: " + grid.traverseGrid) 
+    val startTime = System.currentTimeMillis
+    val part2Results = grid.traverseGrid2
+    val endTime = System.currentTimeMillis
+
+    println("It took " + (endTime - startTime) + " to calculate part 2")
     println("Sum of traversing all iterations of gid part 2: " + grid.traverseGrid2)
   }
 
