@@ -90,29 +90,20 @@ object GardenGroups {
       this.copy(groupPerimeter = groupPerimeter + (point -> updatedCount))
     }
 
-    def updatePlots: GardenAccum = {
-      val gardenPlot = groupPerimeter.foldLeft(GardenPlot(0, 0, 0)){ case (plot, (_, counts)) =>
-        plot.add(counts.size)
-      }
-
-
-      // TODO This is ugly break it out and add tests if you ever have time, if not cry.
-
+    def calculateNumEdges: Int = {
       val sortedEdges = groupPerimeter.values.flatten.map { case (point, dir) => 
         dir match {
-          case GDir.Up => (dir, point.y, point.x)
-          case GDir.Down => (dir, point.y, point.x)
-          case GDir.Left =>  (dir, point.x, point.y)
-          case GDir.Right => (dir, point.x, point.y)
+          case GDir.Up  | GDir.Down => (dir, point.y, point.x)
+          case GDir.Left | GDir.Right =>  (dir, point.x, point.y)
           case _ => throw new Exception("Error should not get to this point")
         }
       }.groupMap{ case (dir, kv, v) => (dir, kv) }{ case (_, _, v) => v }
         .map{ case (k, v) => k -> v.toList.sorted }
       
-      val numEdges = sortedEdges.values
+      val numContiguousLines = sortedEdges.values
         .map { lines =>
           lines.foldLeft((lines.head, 1)) { case ((prev, result), next) => 
-            if (Math.abs(next - prev) > 1) {
+            if (Math.abs(next - prev) > 1) { // There was a "skip" to a new edge
               (next, result + 1)
             } else {
               (next, result)
@@ -120,7 +111,17 @@ object GardenGroups {
           }
         }.map(_._2)
         .sum
-        
+
+        numContiguousLines
+    }
+
+    def updatePlots: GardenAccum = {
+      val gardenPlot = groupPerimeter.foldLeft(GardenPlot(0, 0, 0)){ case (plot, (_, counts)) =>
+        plot.add(counts.size)
+      }
+      
+      val numEdges = calculateNumEdges
+      // TODO This is ugly break it out and add tests if you ever have time, if not cry.
       this.copy(groupPerimeter = Map.empty, plots = plots :+ gardenPlot.addNumEdges(numEdges))
     }
   }
@@ -161,7 +162,6 @@ object GardenGroups {
           } else {
             accum
           }
-
 
           if (accum.visited.contains(neighbor) || outOfBounds) {
             accumWithCheckPerim
