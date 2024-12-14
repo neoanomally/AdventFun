@@ -37,6 +37,12 @@ class ClawContraptionTest extends munit.FunSuite {
     val results = List(2, 2, 5, 5)
   }
 
+  test("Find all factors for 10000000006450") {
+    val factors = ClawMachine.findFactors(BigInt(10000000006450L))
+
+    println(factors)
+  }
+
   test("Solve for part 2") {
     val part2Results = CLAW_CONTRAPTION.findPart2
 
