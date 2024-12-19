@@ -2,6 +2,9 @@ package com.sandersme.advent.twentyfour
 
 import com.sandersme.advent.twentyfour.Register
 import com.sandersme.advent.Input
+import scala.runtime.stdLibPatches.language.`3.0`
+import com.sandersme.advent.twentytwo.model.Monkey.multiplyBusiestMonkies
+import scala.annotation.tailrec
 
 case class Register(A: Int, B: Int, C: Int)
 
@@ -45,70 +48,66 @@ case class ChronoSpatialComputer(instructions: List[Int], idx: Int, registers: R
       println(f"Opcode: ${opcode} and operand: ${operand}")
     }
     opcode match {
-      case 0 => adv(operand) // advance division on Numerator(A) / 2 ^ Combo Operand
-      case 1 => bxl(operand) 
-      case 2 => bst(operand)
-      case 3 => jnz(operand)
-      case 4 => bxc(operand)
-      case 5 => out(operand)
-      case 6 => bdv(operand)
-      case 7 => cdv(operand)
+      case 0 => {
+        val updatedA =  (registers.A / (Math.pow(2, getComboOperand(operand)))).toInt 
+        this.copy(registers = registers.copy(A = updatedA))
+      } 
+      case 1 => {
+        val updatedB = registers.B ^ operand
+        this.copy(registers = registers.copy(B= updatedB))
+      }
+      case 2 => { 
+        val updatedB = getComboOperand(operand) % 8
+        this.copy(registers = registers.copy(B = updatedB))
+      }
+      case 3 if registers.A == 0 => this 
+      case 3 => this.copy(idx = operand - 2)
+      case 4 => {
+        val xor = registers.B ^ registers.C
+        this.copy(registers = registers.copy(B = xor))
+      }
+      case 5 => { this.copy(output = output :+ (getComboOperand(operand) % 8)) } 
+      case 6 => {
+        val updatedB = (registers.A / (Math.pow(2, getComboOperand(operand)))).toInt
+        this.copy(registers = registers.copy(B = updatedB))
+      } 
+      case 7 => {
+        val updatedC = (registers.A / (Math.pow(2, getComboOperand(operand)))).toInt
+        this.copy(registers = registers.copy(C = updatedC))
+      } 
       case _ => throw new Exception("Error should not reach this state in opcodeMatch") 
     }
   }
-
+ // 2,4,  1,3,  7,5,  1,5,  0,3,  4,3,  5,5,  3,0
   // Opcode 0 
-  def adv(operand: Int): ChronoSpatialComputer = {
-    val updatedA =  (registers.A / (Math.pow(2, getComboOperand(operand)))).toInt 
-    val updatedRegisters = registers.copy(A = updatedA)
-    this.copy(registers = updatedRegisters)
-  }
+  // 1. (2, 4) -> takes A % 8 and saves it to B. B will always be 0 - 7. 
+  // 2. (1, 3) -> takes B that was just set from 1. and xor it with 3 - output 3, 2, 1, 0, 7, 6, 5, 4 into reg B       
+  // 3. (7, 5) -> Takes A / Math.pow(2, B) and saves it to C  Math.pow(2, B) is 1, 2, 4,
+  //    8, 16, 32, 64, 128.... So A will divide by that value and save it to reg C 
+  // 4. (0, 3) -> takes A / 8.0 and then stores it into register A 
+  // 5. (4 3) -> takes register B ^ C --- we know that B is always 0 - 7
+  // 6  (5, 5) -> Takes register B % 8 and outputs the value to the terminal. 
+  // 7.(3, 0) -> exits the program if it reaches there whenever A '0' if A does not equal
+  //    zero it jumps back to step 1. While (A != 0)
+  //
+  //
 
-  def bxl(operand: Int): ChronoSpatialComputer = {
-    val updatedB = registers.B ^ operand
-    val updatedRegisters = registers.copy(B = updatedB)
-    this.copy(registers = updatedRegisters)
-  } 
 
-  def bst(operand: Int): ChronoSpatialComputer = {
-    val updatedB = getComboOperand(operand) % 8
-    val updatedReg = registers.copy(B = updatedB) // TODO Not sure if overwrite or add here
-    this.copy(registers = updatedReg)
-  }
+   // WE need to solve for A 
+   // 5 
+   // 2, 4, 1, 3, 7, 5, 1, 5, 0, 3, 4, 3, 5, 5, 3, 0 
+   // To get 0 
+   //
+   // B = 0 
+   // A = 0  = A * 8 
+   // B = 5 = B ^ 5  
+   // C = 0 = A * Math.(2, 5)
+   // B = 6 = B ^ 3
+   // B = 0 A % 8
+
 
   // The jnz instruction (opcode 3) does nothing if the A register is 0. However, if the A register is not zero, it jumps by setting the instruction pointer to the value of its literal operand; if this instruction jumps, the instruction pointer is not increased by 2 after this instruction.
-  def jnz(operand: Int): ChronoSpatialComputer = {
-    if(registers.A == 0) {
-      this
-    } else {
-      // println(f"jumping to $operand")
-      this.copy(idx = operand - 2) // TODO: Should we just update it to idx - 2 here? so that we can generalize adding above?
-    }
-  }
 
-  def bxc(operand: Int): ChronoSpatialComputer = {
-    val xor = registers.B ^ registers.C
-    val updatedReg = registers.copy(B = xor) // Does this get added or replaceD?
-
-    this.copy(registers = updatedReg)
-  }
-
-  def out(operand: Int): ChronoSpatialComputer = {
-    val res = getComboOperand(operand) % 8
-    this.copy(output = output :+ res)
-  }
-
-  def bdv(operand: Int): ChronoSpatialComputer = {
-    val updatedB = (registers.A / (Math.pow(2, getComboOperand(operand)))).toInt
-    val updatedReg = registers.copy(B = updatedB)
-    this.copy(registers = updatedReg)
-  }
-
-  def cdv(operand: Int): ChronoSpatialComputer = {
-    val updatedC = (registers.A / (Math.pow(2, getComboOperand(operand)))).toInt
-    val updatedReg = registers.copy(C = updatedC)
-    this.copy(registers = updatedReg)
-  }
 
   def getComboOperand(operand: Int): Int = {
     if (operand <= 3) {
@@ -127,13 +126,73 @@ case class ChronoSpatialComputer(instructions: List[Int], idx: Int, registers: R
 }
 
 object ChronoSpatialComputer {
+  def solveForAll(input: List[Int]): List[Long] = {
+    input.reverse.foldLeft((List[Long](0), 1)){ case ((aCandidates, step), value) => 
+      val cands = aCandidates.flatMap(candidate => solveValuesStep(candidate, value))
+
+      println("Candidates for step: " + step + " - "  + cands)
+      (cands, step + 1)
+    }._1
+  }
+
+
+  def solveValuesStep(in: Long, valueToCreate: Long): List[Long] = {
+    val candidates = candidatesForA(in)
+    solveBackwards(in, valueToCreate, candidates)
+  }
+
+  def solveBackwards(in: Long, value: Long, candidates: Seq[Long], idx: Int = 0): List[Long] = {
+    candidates.map { AA =>
+      val BB = (AA % 8) ^ 3
+      val CC = (AA * Math.pow(2, BB)).toInt
+      val OUTBB = ((BB ^ CC) ^ 5)
+
+      if (runOneStep(AA, OUTBB, CC) == value)
+        AA
+      else
+        -1
+    }.filter(_ != -1).toList
+  }
+
+  def candidatesForA(in: Long): Seq[Long] = {
+    (0 until 8).map(i => (in * 8) + i)
+  }
+
+  def runOneStep(aIn: Long, bIn: Long, cIn: Long): Long = {
+    var a = aIn;  var b = bIn; var c  = cIn
+    b = a % 8
+    b = b ^ 3
+    c = (a / Math.pow(2, b)).toLong
+    a = a / 8
+    b = ((b ^ c) ^ 5) 
+    b % 8
+  }
+
+  def solve(in: Int): Unit = {
+    var A = in
+    var B = 0 
+    var C = 0
+
+    while (A != 0) {                  // 3, 0 
+      B = A % 8                       // (2, 4)
+      B = B ^ 3                       // 1, 3
+      C = (A / Math.pow(2, B)).toInt  // 7, 5 -- C = A / Math.pow(2, B)
+      B = B ^ 5                       // 1, 5
+      A = A / 8                       // 1, 5 --
+      B = B ^ C   
+      print((B % 8) + " ")           // This should just be an identity  
+    }
+  }
+  
   def main(args: Array[String]): Unit = {
     val input = Input.readTwentyFourFromResource("day17_input")
 
     val computer = parseInput(input)
 
     val advancedStateComputer = advanceStateTillComplete(computer)
-    println(advancedStateComputer.printOutput)
+    println("OUTPUT FROM input of: " + computer.registers.A + "\t" + advancedStateComputer.printOutput)
+    // Validated this works
+    println("LOOKING FOR SOLUTION TO: " + solveForAll(List(2,4,1,3,7,5,1,5,0,3,4,3,5,5,3,0)))
   }
 
   def advanceStateTillComplete(computer: ChronoSpatialComputer): ChronoSpatialComputer = {
