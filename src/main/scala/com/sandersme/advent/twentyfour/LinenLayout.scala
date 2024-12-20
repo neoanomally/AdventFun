@@ -130,6 +130,8 @@ class PrefixTrie {
   }
 
 
+  /// Some dynamic programming to create a map starting backwards at the end of the list. 
+  // I'm making zero copies of strings.
   def iterativeCountNumOptions(in: String): Map[Int, Long] = {
     in.zipWithIndex.foldRight(Map.empty[Int, Long]) { case ((letter, startIdx), startingMemoAgg) => 
       val allTerminalIndicies = findAllTerminalIndicies(in, startIdx)
