@@ -50,7 +50,7 @@ case class RaceCondition(walls: Walls, start: Point, end: Point, width: Int, hei
   }
 
   def createStepGraph(findPoint: Point): Map[Point, Int] = {
-    def loop(queue: Set[Point], visited: Set[Point], currStep: Int, res: Map[Point, Int]): Map[Point, Int] = {
+    def loopG(queue: Set[Point], visited: Set[Point], currStep: Int, res: Map[Point, Int]): Map[Point, Int] = {
       // println("Visited: " + visited)
       if (queue.isEmpty) {
         res
@@ -63,14 +63,14 @@ case class RaceCondition(walls: Walls, start: Point, end: Point, width: Int, hei
         }
 
         val updatedVisited = visited ++ updatedQueue
-        loop(updatedQueue, updatedVisited, currStep + 1, map)
+        loopG(updatedQueue, updatedVisited, currStep + 1, map)
       }
     }
 
-    loop(Set(findPoint), Set(findPoint), 0, Map(end -> 0))
+    loopG(Set(findPoint), Set(findPoint), 0, Map(end -> 0))
   }
 
-  def findTwoStepsAllPoints(endMap: Map[Point, Int]): List[Int] = {
+  def findNumStepsAllPoints(endMap: Map[Point, Int], numSteps: Int = 2): List[Int] = {
     (1 until height).foldLeft(List.empty){ case (yAgg, y) =>
       (1 until width).foldLeft(yAgg){ case (xAgg, x) => 
         val curr = Point(x, y)
@@ -78,7 +78,7 @@ case class RaceCondition(walls: Walls, start: Point, end: Point, width: Int, hei
           case true => xAgg
           case false => {
             val endDist = endMap(curr)
-            val twoSteps = findTwoStepIgnoreWalls(endMap, Point(x, y))
+            val twoSteps = findNumStepsIgnoreWalls(endMap, Point(x, y), numSteps)
             val shortcutDist = twoSteps
               .toList
               .map(p => endDist - endMap.getOrElse(p, endDist) - 2)
@@ -92,9 +92,58 @@ case class RaceCondition(walls: Walls, start: Point, end: Point, width: Int, hei
 
   }
 
-  def findTwoStepIgnoreWalls(endMap: Map[Point, Int], point: Point): Set[Point] = {
-    def loop(queue: Set[Point], visited: Set[Point], currStep: Int): Set[Point] = {
-      if (currStep > 2) {
+  def findNumStepsAllPointsPartTwo(endMap: Map[Point, Int], numSteps: Int = 20): List[Int] = {
+    (1 until height).foldLeft(List.empty) { case (yAgg, y) =>
+      (1 until width).foldLeft(yAgg) { case (xAgg, x) =>
+        val curr = Point(x, y)
+        walls.contains(curr) match {
+          case true => xAgg
+          case false => {
+            val twentySteps = findNumStepsIgnoreWallsPart2(endMap, curr, numSteps)
+            // if (curr == start) {
+              // println("TWenty steps at " + curr)
+              // twentySteps.foreach(println)
+            // }
+
+            xAgg ++ twentySteps.values
+          }
+        }
+      }
+    }
+  }
+  
+  def findNumStepsIgnoreWallsPart2(endMap: Map[Point, Int], point: Point, numSteps: Int): Map[Point, Int] = {
+    def loop(queue: Set[Point], visited: Map[Point, Option[Int]], currStep: Int, currDistance: Int): Map[Point, Option[Int]] = {
+      if (currStep > numSteps) {
+        visited
+      } else {
+        val newNeighbors = queue
+          .filter(!visited.contains(_))
+          .map{ neighbor => 
+            // println(f"Adding ${neighbor} originalDist: ${currDistance} new distance ${endMap.get(neighbor)} saving ${endMap.get(neighbor).map(v => currDistance - v - currStep)}")
+            neighbor -> endMap.get(neighbor).map(v => currDistance - v - currStep)
+          }
+
+        val newQueue: Set[Point] = newNeighbors.flatMap((v, _) => neighborPointsIgnoreWall(v))
+        val updatedVisited = visited ++ newNeighbors
+
+        loop(newQueue, updatedVisited, currStep + 1, currDistance)
+      }
+    }
+
+    val currDistance = endStepMap(point)
+    
+    loop(Set(point), Map.empty, 0, currDistance)
+      .filter(v => !walls.contains(v._1))
+      .filter(_._2.nonEmpty)
+      .map((key, opt) => key -> opt.get)
+      .filter(_._2 >= 0)
+  }
+
+
+  def findNumStepsIgnoreWalls(endMap: Map[Point, Int], point: Point, numSteps: Int = 2): Set[Point] = {
+    def loopF(queue: Set[Point], visited: Set[Point], currStep: Int): Set[Point] = {
+      if (currStep > numSteps) {
         queue
       } else {
         val newQueue = queue.foldLeft(Set.empty[Point]){ case(queueAgg, point) => 
@@ -103,11 +152,11 @@ case class RaceCondition(walls: Walls, start: Point, end: Point, width: Int, hei
         }
         
         val updatedVisited = visited ++ newQueue
-        loop(newQueue, updatedVisited, currStep + 1)
+        loopF(newQueue, updatedVisited, currStep + 1)
       }
     }
 
-    loop(Set(point), Set(point), 1)
+    loopF(Set(point), Set(point), 1)
       .filter(!walls.contains(_))
   }
 }
@@ -120,10 +169,17 @@ object RaceCondition {
 
     val raceCondition = RaceCondition.parseGrid(input)
     val endMap = raceCondition.endStepMap
-    val overHundredSaved = raceCondition.findTwoStepsAllPoints(endMap)
+    val overHundredSaved = raceCondition.findNumStepsAllPoints(endMap)
       .count(_ >= 100)
 
     println(f"The number of cheats that save 100 picoseconds: $overHundredSaved")
+    val overHundredTwenty = raceCondition.findNumStepsAllPointsPartTwo(endMap)
+      .groupMapReduce(identity)(_ => 1)(_ + _)
+      .filter(_._1 >= 100)
+      .map(_._2)
+      .sum
+
+    println(f"Part two the number of cheat codes that save 100 picoseconds part two: ${overHundredTwenty}")
   }
 
   def parseGrid(input: List[String]): RaceCondition = {
