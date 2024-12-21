@@ -114,7 +114,8 @@ object PacketType {
             findClosingBracket(input.tail, List(packet), result)
           } else { // This is the case where we are in the middle of a list and pulling inner list
 
-            val head::tail = result
+            val head = result.head
+            val tail = result.tail
             findClosingBracket(input.tail, List(head, packet), tail)
           }
 

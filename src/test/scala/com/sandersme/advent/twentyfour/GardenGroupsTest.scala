@@ -1,10 +1,10 @@
 package com.sandersme.advent.twentyfour
 
 class GardenGroupsTest extends munit.FunSuite {
-  test("Starting a test now") {
+  test("Starting a test now".ignore) {
     val findAllGroups = GardenGroups.findAllConnectedPoints(PARSED_INPUT)
 
-    println(findAllGroups)
+    // println(findAllGroups)
   } 
 
   test("Calculate value should equal to 1930") {

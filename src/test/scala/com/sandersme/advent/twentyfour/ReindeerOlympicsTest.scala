@@ -67,7 +67,6 @@ class ReindeerOlympicsTest extends munit.FunSuite {
   test("Start grid 6") {
 
     val sixResults =TEST_REINDEER.startTraverseSixDFSThree
-    println(" The size for six: " + sixResults.size)
     
 
 

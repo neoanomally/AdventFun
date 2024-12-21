@@ -349,7 +349,8 @@ object Almanac {
       if (rest.size == 0) {
         accum
       } else {
-        val head::tail = rest
+        val head = rest.head 
+        val tail = rest.tail
         
         val rangeInput = tail.takeWhile(!_.isBlank())
         val remaining = tail.drop(rangeInput.size + 1)

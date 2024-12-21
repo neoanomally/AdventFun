@@ -190,7 +190,9 @@ object  HotSpringsDiagnostics {
       if (remaining.isEmpty) {
         state.finalCounts
       } else {
-        val next::left = remaining
+        val next = remaining.head
+        val left = remaining.tail
+
         loop(left, state.nextWithDiagnostic(next))
       }
     }

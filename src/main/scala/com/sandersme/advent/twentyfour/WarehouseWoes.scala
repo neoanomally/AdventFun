@@ -257,7 +257,7 @@ object WarehouseWoes {
     val secondPointSpace: Point = objectAtTwo(objects, points.head.x, points.head.y) match {
       case LeftBox => movePoint(points.head, Right)
       case RightBox => movePoint(points.head, Left)
-      case err: _ => throw new Exception("Error should never make it to this state " + err + " found")
+      case err: Any => throw new Exception("Error should never make it to this state " + err + " found")
     }
 
     val newPointObjects: List[(Point, TObject)] = points.map { point =>
