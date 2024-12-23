@@ -80,7 +80,7 @@ class LinenLayoutTest extends munit.FunSuite {
      // -- idx 0 -> bwu (lookup index 3) - 1
      // -- no rrg there is an r r g 
     val test = TEST_LINEN.patterns.iterativeCountNumOptions("bwurrg") // should get 6
-    println("END INDICIES: TEST: " + test)
+    // println("END INDICIES: TEST: " + test)
   }
 
   test("validate that all patterns can be found in a test linen") {

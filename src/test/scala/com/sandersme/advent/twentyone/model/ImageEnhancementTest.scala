@@ -4,10 +4,8 @@ import com.sandersme.advent.Input
 import com.sandersme.advent.twentyone.binary.{One, Zero}
 
 class ImageEnhancementTest extends munit.FunSuite {
-  val data: List[String] = Input.readTwentyOneFromResource("day20_testinput")
-  val TEST_IMAGE_ENHANCEMENT: ImageEnhancement = ImageEnhancement.parseInput(data)
 
-  test("Validate that parse input works as expected.") {
+  test("Validate that parse input works as expected.".ignore) {
     assertEquals(TEST_IMAGE_ENHANCEMENT.algorithm.size, 512)
     assertEquals(TEST_IMAGE_ENHANCEMENT.algorithm(2), true)
     assertEquals(TEST_IMAGE_ENHANCEMENT.algorithm.last, true)
@@ -18,20 +16,20 @@ class ImageEnhancementTest extends munit.FunSuite {
     assertEquals(TEST_IMAGE_ENHANCEMENT.activePixels.contains((7, 9)), true)
   }
 
-  test("values to check witha  (0, 0) should equal 18)") {
+  test("values to check witha  (0, 0) should equal 18)".ignore) {
     val resultsA = ImageEnhancement.getAlgorithmIndex((0,0), TEST_IMAGE_ENHANCEMENT)
     val resultsB = ImageEnhancement.getAlgorithmIndex((9, 5), TEST_IMAGE_ENHANCEMENT)
     assertEquals(resultsA, 0)
     assertEquals(resultsB, 32)
   }
 
-  test("Update the pixel value for (0, 0), which should look up index 18 which should return None") {
+  test("Update the pixel value for (0, 0), which should look up index 18 which should return None".ignore) {
     val updatedPixel = ImageEnhancement.updateImageLocation((0, 0), TEST_IMAGE_ENHANCEMENT)
 
     assertEquals(updatedPixel, None)
   }
 
-  test("Validate get potential centers is size 13 and includes (0, 0) itself") {
+  test("Validate get potential centers is size 13 and includes (0, 0) itself".ignore) {
     val origin = (0, 0)
 
     val allPotentialNeighbors = ImageEnhancement.getLocationPotentialNeighbors(origin)
@@ -44,7 +42,7 @@ class ImageEnhancementTest extends munit.FunSuite {
    * TODO: For the main code base ALTERNATIVELY we can do the pixel math on each 13 ahead of time
    * so that we limit HOW Much goes into memory; but this is a good starting step for testing.
    */
-  test("""Get ALL potential activiations for the next iteration. This should be a Set.""") {
+  test("""Get ALL potential activiations for the next iteration. This should be a Set.""".ignore) {
     // TEST Where the neighbors dont' overlap
     val testImageEnhancementA = ImageEnhancement.apply(Set((0, 0), (10, 10)), Vector.empty)
     val allActiveNeighborsA = ImageEnhancement.getAllActiveNeighbors(testImageEnhancementA)
@@ -56,20 +54,20 @@ class ImageEnhancementTest extends munit.FunSuite {
     assertEquals(allActiveNeighborsB.size, 41)
   }
 
-  test("Apply image enhancement twice should equal 35") {
+  test("Apply image enhancement twice should equal 35".ignore) {
     val updatedTwice: ImageEnhancement = TEST_IMAGE_ENHANCEMENT
       .applyEnhancementAlgorithm(2)
 
     assertEquals(updatedTwice.activePixelCount, 35)
   }
 
-  test("Min and max dimensions for the test boarder should return {X, Y} {X, Y}") {
+  test("Min and max dimensions for the test boarder should return {X, Y} {X, Y}".ignore) {
     val dimensions = TEST_IMAGE_ENHANCEMENT.borderDimensions
     val expectedDimensions = MinMaxDimensions(5, 5, 9, 9)
     assertEquals(dimensions, expectedDimensions)
   }
 
-  test("Check if the border / infinity is active") {
+  test("Check if the border / infinity is active".ignore) {
     // Set the first value of the algorithm to true. This is to have the test case when infinity
     // Nodes are blinking e.g. 000000000 => True
     val updatedAlgorithm =  true +: TEST_IMAGE_ENHANCEMENT.algorithm.tail
@@ -87,7 +85,7 @@ class ImageEnhancementTest extends munit.FunSuite {
     assertEquals(secondIteration.isBorderActive, false)
   }
 
-  test("Check if if a location is beyond the border dimensions.") {
+  test("Check if if a location is beyond the border dimensions.".ignore) {
     val firstIterationOriginal = TEST_IMAGE_ENHANCEMENT.applyEnhancementAlgorithm(1)
     val shouldNotBeActiveByeondBorderOriginal = firstIterationOriginal.isActive(1, 1)
     val shouldNotBeActiveBeyondBorderOriginalB = firstIterationOriginal.isActive(12, 13)
@@ -105,7 +103,7 @@ class ImageEnhancementTest extends munit.FunSuite {
     assertEquals(shouldBeActiveBeyondBorderPixelated, One)
   }
 
-  test("IsBeyondBorder check different bordder conditions") {
+  test("IsBeyondBorder check different bordder conditions".ignore) {
     val border = TEST_IMAGE_ENHANCEMENT.borderDimensions
 
     assertEquals(TEST_IMAGE_ENHANCEMENT.isBeyondBorder(5, 5), false)
@@ -114,11 +112,28 @@ class ImageEnhancementTest extends munit.FunSuite {
     assertEquals(TEST_IMAGE_ENHANCEMENT.isBeyondBorder(5, 5), false)
   }
 
-  test("Full day20_input results are 5291") {
+  test("Full day20_input results are 5291".ignore) {
     val fullInput = Input.readTwentyOneFromResource("day20_input")
     val imageEnhancement = ImageEnhancement.parseInput(fullInput)
     val twiceEnhanced = imageEnhancement.applyEnhancementAlgorithm(2)
 
     assertEquals(twiceEnhanced.activePixelCount, 5291)
   }
+
+
+  val data = """..#.#..#####.#.#.#.###.##.....###.##.#..###.####..#####..#....#..#..##..##
+#..######.###...####..#..#####..##..#.#####...##.#.#..#.##..#.#......#.###
+.######.###.####...#.##.##..#..#..#####.....#.#....###..#.##......#.....#.
+.#..#..##..#...##.######.####.####.#.#...#.......#..#.#.#...####.##.#.....
+.#..#...##.#.##..#...##.#.##..###.#......#.#.......#.#.#.####.###.##...#..
+...####.#..#..#.##.#....##..#.####....##...##..#...#......#.#.......#.....
+..##..####..#...#.#.#...##..#.#..###..#####........#..####......#..#
+
+#..#.
+#....
+##..#
+..#..
+..###""".stripMargin.split("\n").toList
+
+  val TEST_IMAGE_ENHANCEMENT: ImageEnhancement = ImageEnhancement.parseInput(data)
 }

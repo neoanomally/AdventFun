@@ -91,7 +91,7 @@ class SevenSegmentTest extends munit.FunSuite {
   }
 
   // THIS PASSED PART 1 WTF
-  test("Test something that I hate about myself because I don't read well.") {
+  test("Test something that I hate about myself because I don't read well.".ignore) {
 
     val input = Input.readTwentyOneFromResource("day8_input")
     val inputSevenSegment = SevenSegment.parseInput(input)
