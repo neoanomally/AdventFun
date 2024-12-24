@@ -141,6 +141,7 @@ object KeypadConundrum {
     val input = Input.readTwentyFourFromResource("day21_input")
 
     val keypadConundrum = KeypadConundrum.parseInput(input)
+    val startTime = System.currentTimeMillis()
     // val shortestPathCost = keypadConundrum.calculateShortestPathCosts
     //
     // println(f"The cost for the shortest path is: $shortestPathCost")
@@ -149,8 +150,9 @@ object KeypadConundrum {
     println(f"The cost for the shortest path in part one is $shortestPathCostPartOne and should be 179444")
 
     val partTwoCost = keypadConundrum.calculateCostPartTwo
-    println(keypadConundrum.numRobots)
-    println(f"The cost for shortest Path for 25 robots is: $partTwoCost")
+
+    val endTime = System.currentTimeMillis()
+    println(f"The cost for shortest Path for 25 robots is: $partTwoCost and took ${endTime - startTime}ms")
   }
 
   def createKeyPoints(graph: Vector[Vector[Char]]): KeyGraph = {
