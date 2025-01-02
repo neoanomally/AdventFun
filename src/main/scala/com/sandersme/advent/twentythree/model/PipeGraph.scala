@@ -4,9 +4,7 @@ import com.sandersme.advent.twentyone.graph.Point
 
 import PipeType._
 import com.sandersme.advent.twentytwo.model.CommDecoder.loopIncrementCharacters
-import com.sandersme.advent.twentythree.PipeMaze.pipeGraph
 import scala.annotation.tailrec
-import com.sandersme.advent.twentythree.PipeMaze.loopedMap
 import com.sandersme.advent.twentythree.model.PipeGraph.toLeft
 
 case class PipeGraph(pipes: Vector[Vector[Pipe]]) {

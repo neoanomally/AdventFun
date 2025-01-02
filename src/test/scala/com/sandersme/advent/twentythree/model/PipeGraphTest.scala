@@ -2,7 +2,6 @@ package com.sandersme.advent.twentythree.model
 
 import com.sandersme.advent.twentyone.graph.Point
 import com.sandersme.advent.twentythree.model.PipeGraph.findNeighbors
-import com.sandersme.advent.twentythree.PipeMaze.transformedPipeGraph
 
 class PipeGraphTest extends munit.FunSuite {
 
