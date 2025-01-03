@@ -39,15 +39,43 @@ class PipeMazeTest extends munit.FunSuite {
     val twoTwoNeighbors = TEST_PIPE.findTwoNeighbors(2, 2)
     
     assertEquals(startNeighbors.size, 2)
-    assertEquals(startNeighbors.last, (0, 3))
+    assertEquals(startNeighbors.last, (0, 3, Dir.S))
     assertEquals(oneOneNeighbros.size, 2)
     assertEquals(twoTwoNeighbors.size, 0)
   }
 
   test("Test that we can flood the outside of the board") {
-    val floodedBoard = TEST_PIPE.floodBoard  
+    val floodedBoard = TEST_PIPE2.floodOuterBoard  
 
-    println(floodedBoard)
+    assertEquals(floodedBoard.size, 50)
+  }
+
+  test("Test flood openings") {
+    val removedPipes = TEST_PIPE2.removePipesNotInLoop
+    val floodedBoard = removedPipes.floodOuterBoard
+
+    val floodOpenings = removedPipes.floodOpenings(floodedBoard)
+
+    val innerPipes = removedPipes.mazeSize -  floodOpenings.size
+    assertEquals(innerPipes, 8)
+  } 
+
+  test("Validate the mazes Size") {
+    val size = TEST_PIPE2.mazeSize
+
+    assertEquals(size, 200)
+
+  }
+
+  test("TEST flooding a specific direction for the inner map") {
+    val results = TEST_PIPE2.floodDirection(10,4,Set.empty, Dir.E) 
+
+    assertEquals(results.size, 5)
+  }
+
+
+  test("TEST PRINT MAZE".ignore) { 
+    TEST_PIPE2.removePipesNotInLoop.printMaze
   }
 
   val TEST_INPUT = """7-F7-
