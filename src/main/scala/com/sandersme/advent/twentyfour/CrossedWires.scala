@@ -105,10 +105,8 @@ case class CrossedWires(wires: Map[String, Boolean], gateInstructions: List[Gate
 
     val  updatedGateInstructions = gateInstructions.map{ instruction =>
       if (instruction.outWire == left) {
-        println(f"Swapping ${left} with ${right} ${instruction} to ${instruction.copy(outWire = right)}")
         instruction.copy(outWire = right )
       } else if (instruction.outWire == right) {
-        println(f"Swapping ${left} with ${right} ${instruction} to ${instruction.copy(outWire = left)}")
         instruction.copy(outWire = left)
       } else {
         instruction 
@@ -220,7 +218,6 @@ case class CrossedWires(wires: Map[String, Boolean], gateInstructions: List[Gate
     }
 
     if(instructions.isEmpty || loopCount > MAX_LOOPS) {
-      println(f"We looped ${loopCount} times")
       currentWireMap
     } else {
       val (skippedInstructions, updatedWires) = instructions

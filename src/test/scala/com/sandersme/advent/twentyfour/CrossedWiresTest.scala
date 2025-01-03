@@ -20,7 +20,7 @@ class CrossedWiresTest extends munit.FunSuite {
 
     wires.findCandidateGates
       .toList.sortBy(-_._2)
-      .foreach(println)
+      // .foreach(println)
     // println(wires.xBinary)
     // println(wires.yBinary)
     // println(xLong)
