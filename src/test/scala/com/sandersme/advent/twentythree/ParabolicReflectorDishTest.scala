@@ -6,11 +6,20 @@ class ParabolicReflectorDishTest extends munit.FunSuite {
   }
 
   test("Calculate load of rocks after tilt") {
-    val load = TEST_DISH.tiltRocksNorth.calculateLoad
+    val load = TEST_DISH.tiltAndRotate 
+    assertEquals(load, 64)
+  }
 
-
+  test("Calculate load of rocks after one tilt north") {
+    val load = TEST_DISH.tiltRocksNorth.calculateLoad 
     assertEquals(load, 136)
   }
+  
+  test("Spin 3 times printing them each".ignore) {
+    TEST_DISH.spinNCyclesAndPrint(3)
+  }
+
+
 
   val TEST_INPUT = """  O....#....
                         O.OO#....#
