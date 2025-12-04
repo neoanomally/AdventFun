@@ -1,0 +1,20 @@
+mod advent_io;
+mod advent_2025;
+
+use advent_io::advent_file;
+
+fn main() { 
+    
+    let config = advent_file::read_default_config();
+    
+    for (k, v) in config {
+        println!("{}  --  {}", k, v);
+    }
+
+    let day1_data = advent_file::read2025("day1_input");
+
+    for line in day1_data {
+        println!("{}", line);
+    }
+
+}
