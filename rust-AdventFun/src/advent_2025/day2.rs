@@ -8,6 +8,15 @@ struct ProductId {
 }
 
 impl ProductId {
+    // Tried to do this a weird way where instead of iterating through every possible number; we
+    // can know ahead of time that this works only on even lengthed sequences of numbers. Once we
+    // know that we can then find the nearest even length number. THe start rounds up and the end
+    // portion rounds down to the nearest even lengthed number. Once we have those we can split the
+    // left in half and the right in halves. Additional rounding needs to happen; then we just
+    // increment once per invalid id. This is very very very efficient and can be done for large
+    // ranges so that you don't have to check every number. Once we figure out the splits it should
+    // evaluate once per invalid number. So even when checking millions of numbers you might only
+    // do 30-40 calculations depending on the ranges and number of ranges.
     fn count_invalid_ids_part_one(&self) -> i64 {
         let mut sum = 0;
         // get the start and end. We need to only take even valuesj
@@ -53,9 +62,21 @@ impl ProductId {
         sum
     }
 
-    /// What we can do here is only do this for ODD lengthed numbers 
-    /// Now we can brute force this. 
-    // 11-22  11 to 222 11 /2
+    /// For part one i did a very efficient solution given we always know they are even lengthed
+    /// numbers. IN this case where repeating numbers can happen any number of times. For example
+    /// 128128128 repeats 128 three different times. We are going to do a similar strategy as part
+    /// one but we  will iterate from the start of the range to the end of the range. We do some
+    /// math to figure out the length of a number by taking the log of the current number we are
+    /// evaluating. Once we have the length we find the mid point which will give us the max number
+    /// of times we can split a number. For example 128128128128 is a length of 12, you can have up
+    /// to six pairs... We then iterate 1...6 in that example and chexck that number of lengths. We
+    /// use modulo and exponentials of 10 to mod off the last n digits. starting with 1... The
+    /// right most value is 8, we then repeat it doing some more maths using repeat_n_times. we
+    /// know we need to get back to length 12 so we repeat 8 times for the 128 example. Then we do
+    /// 28 (repeat it 6 times 282828282828 <- compare it to the original number), then 128 4 times
+    ///    and wahla we have a matching number where repeated is equal to the original. Then we add
+    ///    that value to the sum and break out of this calculation because we don't want to double
+    ///    count in the case of special repeating numbers like 222222. 
     fn count_invalid_ids_part_two(&self) -> i64 {
         let upper_bound = self.end.parse::<i64>().unwrap();
         let start = self.start.parse::<i64>().unwrap();
@@ -172,6 +193,15 @@ pub fn extend_half(input: i64) -> i64 {
     input * multiplier
 }
 
+/// This is a fun mehtod. Essentially we want to take any number and repeat it n times. For example
+/// if we have 128 and we want to repeat it three times to equal something like 128128128 we can do
+/// that using some clever math. We get the length of the current number using ilog10 and add 1 to
+/// the value. Then we take 10^(len*repeat_n). Then we get something like 999 or 9,999 or some
+/// combinations of 9s then we do the same thing with the denominator but it will give us 9 or 99
+/// where it's essentially going to give us some whole number of 1111 when we divide the top by the
+/// bottom. Once we have those repeating ones we multiply it by our original number 
+/// Example we have 128 which is len 3 and we want to repeat it twice. We'll get 999,999 / 999 = 1001
+/// we then multiply 1001 * 128 = 128128. 
 pub fn repeat_n_times(x: i64, n: u32) -> i64 {
     const TEN: i64 = 10;
     match x.checked_ilog10() {
