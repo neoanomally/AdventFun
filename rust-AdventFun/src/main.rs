@@ -14,7 +14,7 @@ fn main() {
             "--day" => {
                 day = args_iter.next().expect("Expect a parameter for day");
             },
-            value => println!("Arg: {} unexpected", value)
+            value => println!("Arg: {} unexpected. Usage for specific day include --day #", value)
         }
     }
 
@@ -22,8 +22,8 @@ fn main() {
         "1" => advent_2025::day1::run_day_one_part_one(),
         "2" => advent_2025::day2::run_with_data(),
         rest => {
+            println!("Invalid or unimplemented --day: {}", rest);
             advent_2025::day2::run_with_data();
-            println!("Invalid or unimplemented day: {}", rest)
         }
     }
     
