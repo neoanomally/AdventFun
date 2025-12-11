@@ -19,11 +19,12 @@ fn main() {
     }
 
     match day {
-        "1" => advent_2025::day1::run_day_one_part_one(),
+        "1" => advent_2025::day1::run_day_one_all(),
         "2" => advent_2025::day2::run_with_data(),
+        "3" => advent_2025::day3::run_with_data(),
         rest => {
             println!("Invalid or unimplemented --day: {}", rest);
-            advent_2025::day2::run_with_data();
+            advent_2025::day3::run_with_data();
         }
     }
     

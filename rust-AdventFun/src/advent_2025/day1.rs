@@ -1,7 +1,7 @@
 use crate::advent_io;
 
 
-pub fn run_day_one_part_one() {
+pub fn run_day_one_all() {
     println!("Running day one part one test data");
     rotate_dial_test_data();
     println!("Running day one part one full data");
