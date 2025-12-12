@@ -7,6 +7,10 @@ struct Grid {
 }
 
 impl Grid {
+    fn clone(&self) -> Grid {
+        Grid { value: self.value.clone() }
+    }
+
     fn max_x(&self) -> i32 {
       self.value.len() as i32
     }
@@ -20,7 +24,41 @@ impl Grid {
 
     }
 
-    fn count_all_valid_rolls(&self) -> i64{
+    fn remove_roll(&mut self, x_loc: usize, y_loc: usize) {
+        self.value[x_loc][y_loc] = 'X'
+    }
+
+    fn remove_and_count_valid(&self) -> i64 {
+        let mut grid_copy = self.clone();
+
+        let mut sum = 0;
+
+        let mut has_incremented_count = true;
+        let mut trip_wire = 0;
+
+        while has_incremented_count && trip_wire < 1000 {
+            trip_wire += 1;
+            has_incremented_count = false;
+
+            for x in 0..grid_copy.max_x(){
+                
+                for y in 0..grid_copy.max_y() {
+                    if grid_copy.is_roll(x, y) && can_move(&grid_copy, x, y) {
+                        sum += 1;
+                        grid_copy.remove_roll(x as usize, y as usize);
+                        has_incremented_count = true;
+                    }
+                }
+            }
+        }
+
+        if trip_wire >= 1000 {
+            panic!("ERROR: Trip wire went over 1000 times");
+        }
+        sum
+    }
+
+    fn count_all_valid_rolls(&self) -> i64 {
         println!("Max  X: {}\tMax Y: {}", self.max_x(), self.max_y());
         let mut sum = 0;
         for x in 0..self.max_x() {
@@ -40,8 +78,10 @@ pub fn run_with_test_data() {
     let parsed_input = parse_input(input);
     let total_can_move = parsed_input.count_all_valid_rolls();
 
+    let total_can_move_part_two = parsed_input.remove_and_count_valid();
+
     println!("Total tha can move: {}", total_can_move);
-    
+    println!("Total numbers that can move part two: {}", total_can_move_part_two);
 }
 
 
@@ -49,7 +89,9 @@ pub fn run_with_data() {
     let input = advent_file::read2025("day4_input");
     let parsed_input = parse_input(input);
     let total_can_move = parsed_input.count_all_valid_rolls();
+    let total_can_move_part_two = parsed_input.remove_and_count_valid();
     println!("Total tha can move: {}", total_can_move);
+    println!("Total numbers that can move part two: {}", total_can_move_part_two);
 }
 
 fn parse_input(input: Vec<String>) -> Grid {

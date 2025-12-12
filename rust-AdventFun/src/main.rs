@@ -27,7 +27,7 @@ fn main() {
         "4" => advent_2025::day4::run_with_data(),
         rest => {
             println!("Invalid or unimplemented --day: {}", rest);
-            advent_2025::day4::run_with_test_data();
+            advent_2025::day4::run_with_data();
         }
     }
     
