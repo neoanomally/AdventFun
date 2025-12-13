@@ -73,6 +73,7 @@ impl Grid {
     }
 }
 
+#[allow(dead_code)]
 pub fn run_with_test_data() {
     let input = advent_file::read2025("test_day4_input");
     let parsed_input = parse_input(input);
