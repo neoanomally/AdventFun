@@ -73,6 +73,7 @@ impl Grid {
     }
 }
 
+#[test]
 pub fn run_with_test_data() {
     let input = advent_file::read2025("test_day4_input");
     let parsed_input = parse_input(input);
@@ -133,7 +134,7 @@ mod tests {
 
     #[test]
     fn test_num_neighbors() {
-        // ..@@
+        // 
         // @@@.
         // @@@@
         let test_input: Vec<String> = vec!["..@@".to_string(),"@@@.".to_string(),"@@@@".to_string()];
