@@ -29,6 +29,10 @@ impl CircuitPair {
         let sums = sums as f32;
         sums.sqrt()
     }
+
+    fn wall_distance(&self) -> u32 {
+        self.left.x * self.right.x
+    }
 }
 
 impl Ord for CircuitPair {
@@ -65,10 +69,11 @@ fn run_day8(input: Vec<String>) {
     let circuits = parse_input(input);
 
     let heap = create_heap(circuits.clone());
-    let connected_pairs = connect_pairs(circuits, heap);
+    let (connected_pairs, final_pair) = connect_pairs(circuits, heap);
     let counts = calculate_top_groups(connected_pairs);
 
     println!("Top Counts: {}", counts);
+    println!("Final pair: {:?}\nScore: {}", final_pair, final_pair.wall_distance());
 }
 
 // Should contain a line of u16
@@ -113,22 +118,22 @@ fn calculate_top_groups(id_groups: HashMap<u32, Vec<Circuit>>) -> u32 {
     accum
 }
 
-fn connect_pairs(circuits: Vec<Circuit>, mut pairs: BinaryHeap<CircuitPair>) -> HashMap<u32, Vec<Circuit>>{
+fn connect_pairs(circuits: Vec<Circuit>, mut pairs: BinaryHeap<CircuitPair>) -> (HashMap<u32, Vec<Circuit>>, CircuitPair) {
     let total_num_circuits = circuits.len();
     let mut circuit_ids: HashMap<Circuit, u32> = HashMap::new();
     let mut id_groups: HashMap<u32, Vec<Circuit>> = HashMap::new();
-    let mut num_evals = 0;
+    let mut last_pair = CircuitPair::new(Circuit::new(0, 1, 1), Circuit::new(1, 1, 1));
 
     for i in 0..total_num_circuits { 
         circuit_ids.insert(circuits[i], i as u32); 
         id_groups.insert(i as u32, vec![circuits[i]]);
     }
 
-    while  !pairs.is_empty() && num_evals < total_num_circuits {
-        num_evals += 1;
+    while  !pairs.is_empty() && id_groups.len() > 1 {
         let next = pairs.pop().unwrap();
 
         let (left_id, right_id) = retrieve_indexes(next.left, next.right, &circuit_ids);
+        last_pair = next;
     
         if left_id.is_some() && right_id.is_some() && left_id.unwrap() != right_id.unwrap() {
             let left_id = left_id.unwrap();
@@ -143,12 +148,7 @@ fn connect_pairs(circuits: Vec<Circuit>, mut pairs: BinaryHeap<CircuitPair>) -> 
         }
     }
 
-    println!("ID_GROUPS: ");
-    for i in id_groups.keys() {
-        println!("{} -- {:?}", i, id_groups[i]);
-    }
-
-    id_groups
+    (id_groups, last_pair)
 }
 
 fn retrieve_indexes(left: Circuit, right: Circuit, lookup: &HashMap<Circuit, u32>) -> (Option<u32>, Option<u32>) {
@@ -181,9 +181,10 @@ pub mod day8_tests {
         let  circuits = parse_input(test_input);
         let ciruit_heap: BinaryHeap<CircuitPair> = create_heap(circuits.clone());
 
-        let connected_pairs = connect_pairs(circuits, ciruit_heap);
+        let (connected_pairs, final_pair) = connect_pairs(circuits, ciruit_heap);
         let score = calculate_top_groups(connected_pairs);
 
-        assert_eq!(score, 40);
+        assert_eq!(final_pair.wall_distance(), 25272);
+        assert_eq!(score, 20);
     }
 }
