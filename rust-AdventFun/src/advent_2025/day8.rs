@@ -143,6 +143,11 @@ fn connect_pairs(circuits: Vec<Circuit>, mut pairs: BinaryHeap<CircuitPair>) -> 
         }
     }
 
+    println!("ID_GROUPS: ");
+    for i in id_groups.keys() {
+        println!("{} -- {:?}", i, id_groups[i]);
+    }
+
     id_groups
 }
 
