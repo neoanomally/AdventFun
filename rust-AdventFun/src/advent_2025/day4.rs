@@ -1,5 +1,3 @@
-use std::usize;
-
 use crate::advent_io::advent_file;
 
 struct Grid {
@@ -81,8 +79,8 @@ pub fn run_with_test_data() {
 
     let total_can_move_part_two = parsed_input.remove_and_count_valid();
 
-    println!("Total tha can move: {}", total_can_move);
-    println!("Total numbers that can move part two: {}", total_can_move_part_two);
+    println!("Total tha can move: {total_can_move}");
+    println!("Total numbers that can move part two: {total_can_move_part_two}");
 }
 
 
@@ -91,8 +89,8 @@ pub fn run_with_data() {
     let parsed_input = parse_input(input);
     let total_can_move = parsed_input.count_all_valid_rolls();
     let total_can_move_part_two = parsed_input.remove_and_count_valid();
-    println!("Total tha can move: {}", total_can_move);
-    println!("Total numbers that can move part two: {}", total_can_move_part_two);
+    println!("Total tha can move: {total_can_move}");
+    println!("Total numbers that can move part two: {total_can_move_part_two}");
 }
 
 fn parse_input(input: Vec<String>) -> Grid {

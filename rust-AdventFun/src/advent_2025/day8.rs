@@ -18,7 +18,7 @@ struct CircuitPair {
 
 impl CircuitPair {
     fn new(left: Circuit, right: Circuit) -> CircuitPair {
-        CircuitPair { left: left, right: right }
+        CircuitPair { left, right }
     }
 
     fn distance(&self) -> f32 {
@@ -26,7 +26,6 @@ impl CircuitPair {
             + (self.left.y as f32 - self.right.y as f32 ).powi(2) 
             + (self.left.z as f32 - self.right.z as f32).powi(2);
 
-        let sums = sums as f32;
         sums.sqrt()
     }
 
@@ -41,6 +40,7 @@ impl Ord for CircuitPair {
     }
 }
 
+#[allow(clippy::non_canonical_partial_ord_impl)]
 impl PartialOrd for CircuitPair {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
         Some(self.cmp(other).reverse())
@@ -49,7 +49,7 @@ impl PartialOrd for CircuitPair {
 
 impl Circuit {
     fn new(x: u32, y: u32, z: u32) -> Circuit {
-        Circuit { x: x, y: y, z: z }
+        Circuit { x, y, z }
     }
 }
 
@@ -72,7 +72,7 @@ fn run_day8(input: Vec<String>) {
     let (connected_pairs, final_pair) = connect_pairs(circuits, heap);
     let counts = calculate_top_groups(connected_pairs);
 
-    println!("Top Counts: {}", counts);
+    println!("Top Counts: {counts}");
     println!("Final pair: {:?}\nScore: {}", final_pair, final_pair.wall_distance());
 }
 
@@ -112,22 +112,22 @@ fn calculate_top_groups(id_groups: HashMap<u32, Vec<Circuit>>) -> u32 {
     let mut accum = 1;
     // println!("LENS: {:?}", lens);
     for i in lens.iter().take(3) {
-        accum = accum * i;
+        accum *= i;
     }
 
     accum
 }
 
 fn connect_pairs(circuits: Vec<Circuit>, mut pairs: BinaryHeap<CircuitPair>) -> (HashMap<u32, Vec<Circuit>>, CircuitPair) {
-    let total_num_circuits = circuits.len();
     let mut circuit_ids: HashMap<Circuit, u32> = HashMap::new();
     let mut id_groups: HashMap<u32, Vec<Circuit>> = HashMap::new();
     let mut last_pair = CircuitPair::new(Circuit::new(0, 1, 1), Circuit::new(1, 1, 1));
 
-    for i in 0..total_num_circuits { 
-        circuit_ids.insert(circuits[i], i as u32); 
-        id_groups.insert(i as u32, vec![circuits[i]]);
+    for (idx, circuit) in circuits.into_iter().enumerate() {
+        circuit_ids.insert(circuit, idx as u32);
+        id_groups.insert(idx as u32, vec![circuit]);
     }
+
 
     while  !pairs.is_empty() && id_groups.len() > 1 {
         let next = pairs.pop().unwrap();
@@ -152,8 +152,8 @@ fn connect_pairs(circuits: Vec<Circuit>, mut pairs: BinaryHeap<CircuitPair>) -> 
 }
 
 fn retrieve_indexes(left: Circuit, right: Circuit, lookup: &HashMap<Circuit, u32>) -> (Option<u32>, Option<u32>) {
-    (lookup.get(&left).map(|f| *f), 
-     lookup.get(&right).map(|f| *f))
+    (lookup.get(&left).copied(), 
+     lookup.get(&right).copied())
 }
 
 #[cfg(test)]
