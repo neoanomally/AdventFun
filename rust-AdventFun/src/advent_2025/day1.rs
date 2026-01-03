@@ -45,16 +45,16 @@ pub fn rotate_dial(data: Vec<String>) -> i32 {
         // TODO Check if we rotated past zero. 
         match direction {
             Some('L') => {
-                current_position = current_position - remainder;
+                current_position -= remainder;
                 if current_position < 0 {
-                    current_position = 100 + current_position;
+                    current_position += 100; 
                     if starting_position != 0  { rotated_past = true; }
                 } 
             },
             Some('R') => {
-                current_position = current_position + remainder;
+                current_position += remainder; 
                 if current_position >= 100 {
-                    current_position = current_position - 100;
+                    current_position -= 100;
                     rotated_past = true;
                 }
                 // if starting_position == 0 && current_position < 100 { num_all_zeroes += 1; }
@@ -69,7 +69,7 @@ pub fn rotate_dial(data: Vec<String>) -> i32 {
         if rotated_past || current_position == 0 { num_all_zeroes += 1; } 
     }
 
-    println!("The number of zeroes: {}", num_exact_zeroes);
-    println!("The total number of zeroes: {}", num_all_zeroes);
+    println!("The number of zeroes: {num_exact_zeroes}");
+    println!("The total number of zeroes: {num_all_zeroes}");
     num_exact_zeroes
 }

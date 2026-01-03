@@ -71,7 +71,7 @@ impl Polygon {
     //      ________________
     //           ____________
     //   ________|
-    #[allow(dead_code)]
+    #[allow(dead_code,unused_variables)]
     fn is_coord_inside(&mut self, coord: &Coord) -> bool {
         if self.cache.contains_key(coord) {
             return *self.cache.get(coord).unwrap();
@@ -110,16 +110,16 @@ impl Polygon {
         set.insert(Coord::new(2, 5));
         set.insert(Coord::new(9, 5));
         let all_sides_found = up % 2 != 0 && down % 2 != 0 && left % 2 != 0 && right % 2 != 0;
-        if set.contains(coord) {
-            println!("Coord: {:?} All sides: up= {} down= {} left= {} right= {} Out= {} In= {}", coord, up, down, left, right, not_within, on_the_line);
-        }
+        // if set.contains(coord) {
+            // println!("Coord: {:?} All sides: up= {} down= {} left= {} right= {} Out= {} In= {}", coord, up, down, left, right, not_within, on_the_line);
+        // }
 
         let result = is_on_the_line || all_sides_found;
         self.cache.insert(coord.clone(), result);
         result
     }
 
-    fn find_red_tiles_max_area_within(&mut self, coords: &Vec<Coord>) -> u64 {
+    fn find_red_tiles_max_area_within(&mut self, coords: &[Coord]) -> u64 {
         let mut lines: HashSet<TileLine> = HashSet::new();  
         for i in 0..coords.len() {
             for j in i+1..coords.len() {
@@ -206,12 +206,12 @@ impl GreenTileLines {
             let mid_entry = self.lines.get(mid).unwrap();
 
             let ordering_comp = if is_vertical {
-                line.cmp(&mid_entry)
+                line.cmp(mid_entry)
             } else {
-                line.cmp_horizontal(&mid_entry)
+                line.cmp_horizontal(mid_entry)
             };
 
-            if line.is_fully_within(&mid_entry) {
+            if line.is_fully_within(mid_entry) {
                 return true
             } else if ordering_comp == Ordering::Less {
                 left = mid + 1;
@@ -220,7 +220,7 @@ impl GreenTileLines {
             }
         }
 
-        return false;
+        false
     }
 
     // Really these are creating lines to make sure any rectangle that we create are within existing
@@ -229,7 +229,7 @@ impl GreenTileLines {
     // 1. Find all lines
     // 2. Merge overlapping lines
     // 3. index each line into two hashmaps: Vertical Lookups and Horizontal lookupsjjj
-    fn from_coords(input: &Vec<Coord>) -> GreenTileLines {
+    fn from_coords(input: &[Coord]) -> GreenTileLines {
         let mut green_tiles: Vec<TileLine> = Vec::new();
 
         for i in 0..input.len() {
@@ -287,10 +287,10 @@ impl GreenTileLines {
         GreenTileLines::create_polygons(&self.lines)
     }
 
-    fn create_polygons(tiles: &Vec<TileLine>) -> Vec<Polygon> {
+    fn create_polygons(tiles: &[TileLine]) -> Vec<Polygon> {
         GreenTileLines::connect_lines(tiles)
             .into_iter()
-            .filter(|cluster| GreenTileLines::is_polygon(cluster))
+            .filter(GreenTileLines::is_polygon)
             .map(|mut cluster| {
                 cluster.sort();
                 Polygon::new(cluster)
@@ -298,7 +298,7 @@ impl GreenTileLines {
             .collect()
     }
 
-    fn connect_lines(tiles: &Vec<TileLine>) -> Vec<Vec<TileLine>> {
+    fn connect_lines(tiles: &[TileLine]) -> Vec<Vec<TileLine>> {
         let mut line_index: HashMap<TileLine, usize> = HashMap::new();
         let mut clusters: HashMap<usize, Vec<TileLine>> = HashMap::new();
 
@@ -313,8 +313,8 @@ impl GreenTileLines {
 
                 let left = tiles.get(i).unwrap();
                 let right = tiles.get(j).unwrap();
-                let left_idx = *line_index.get(&left).unwrap();
-                let right_idx = *line_index.get(&right).unwrap();
+                let left_idx = *line_index.get(left).unwrap();
+                let right_idx = *line_index.get(right).unwrap();
 
                 if left.can_connect(right) && left_idx != right_idx {
                     // What happens if you remove an entry and then it no longer exists. the line
@@ -338,13 +338,14 @@ impl GreenTileLines {
     }
 
 
+    #[allow(clippy::ptr_arg)]
     fn is_polygon(cluster: &Vec<TileLine>) -> bool {
         let mut connected_polygon: Vec<TileLine> = Vec::new();
         if cluster.len() < 3 {
             return false;
         }
 
-        let mut cloned = cluster.clone();
+        let mut cloned = cluster.clone().to_vec();
         let starter_line = cloned.remove(0);
         let starting_point: Coord = starter_line.start.clone();
         let mut did_pull = true;
@@ -444,6 +445,7 @@ impl TileLine {
             || (self.end.y >= other.start.y && self.end.y <= other.end.y))
     }
 
+    #[allow(clippy::nonminimal_bool)]
     fn has_overlapping_vertical(&self, other: &TileLine) -> bool {
         let all_same_y = self.start.y == other.start.y && self.start.y == self.end.y && self.start.y == other.end.y;
         all_same_y && ((self.start.x >= other.start.x && self.end.x <= other.end.x)
@@ -533,15 +535,15 @@ fn run_day9(input: Vec<String>) {
     assert_eq!(polygons.len(), 1);
     let mut polygon = polygons.remove(0);
     println!("Polygon has {} edges", polygon.num_edges());
-    println!("The max area for Part 1: {}", max_area);
+    println!("The max area for Part 1: {max_area}");
 
     let max_gree_area_in_polygon = polygon.find_red_tiles_max_area_within(&red_tiles);
 
-    println!("Max green area in polygon: {:?}", max_gree_area_in_polygon);
+    println!("Max green area in polygon: {max_gree_area_in_polygon}");
 
 }
 
-fn find_max_rectangle_area(coords: &Vec<Coord>) -> u64 {
+fn find_max_rectangle_area(coords: &[Coord]) -> u64 {
     let mut largest_rectangle = 0;
 
     for i in 0..coords.len() {
@@ -582,7 +584,7 @@ mod day9_tests {
 
     #[test]
     fn test_parse_input() {
-        let input: Vec<String> = vec!["7,1", "11,1", "9,7"].iter().map(|f| f.to_string()).collect();
+        let input: Vec<String> = ["7,1", "11,1", "9,7"].iter().map(|f| f.to_string()).collect();
         let coords = parse_input(input);
 
 
@@ -772,7 +774,7 @@ mod day9_tests {
         let is_polygon = GreenTileLines::is_polygon(&lines_two);
         let polygons = GreenTileLines::create_polygons(&lines); // Add some full polygon
         let polygons_two = GreenTileLines::create_polygons(&lines_two);
-        assert_eq!(is_polygon, true);
+        assert!(is_polygon);
         assert_eq!(polygons.len(), 0);
         assert_eq!(polygons_two.len(), 1)
     }

@@ -1,5 +1,3 @@
-use std::i64;
-
 use crate::advent_io;
 
 struct ProductId {
@@ -120,8 +118,8 @@ pub fn run_with_data() {
     let total_numbers_checked = product_ids.iter().fold(0, |acc, x| acc + x.count_num_values_in_range());
     let total_numbers_part_two = product_ids.iter().fold(0, |acc, x| acc + x.count_invalid_ids_part_two());
 
-    println!("Sum of invalid ids: {}\t Number of values in Range: {}", counts, total_numbers_checked);
-    println!("Number of invalid product ids part 2: {}", total_numbers_part_two);
+    println!("Sum of invalid ids: {counts}\t Number of values in Range: {total_numbers_checked}");
+    println!("Number of invalid product ids part 2: {total_numbers_part_two}");
 }
 
 #[allow(dead_code)]
@@ -134,8 +132,8 @@ pub fn run_with_test_data() {
 
     let total_numbers_checked = test_product_ids.iter().fold(0, |acc, x| acc + x.count_num_values_in_range());
     let total_numbers_part_2 = test_product_ids.iter().fold(0, |acc, x| acc + x.count_invalid_ids_part_two());
-    println!("Number of invalid product ids: {}\tNumber of values in Range: {}", counts, total_numbers_checked);
-    println!("Number of invalid product ids part 2: {}", total_numbers_part_2);
+    println!("Number of invalid product ids: {counts}\tNumber of values in Range: {total_numbers_checked}");
+    println!("Number of invalid product ids part 2: {total_numbers_part_2}");
 }
 
 fn parse_product_ids(input: &str) -> Vec<ProductId> { 
@@ -165,9 +163,7 @@ pub fn find_first_invalid(input: &str) -> i64 {
     let right:i64 = right.parse().unwrap();
 
 
-    let min_start = std::cmp::max(left, right);
-
-    min_start
+    std::cmp::max(left, right)
 }
 
 pub fn current_len(input: i64) -> i64 {
@@ -180,7 +176,7 @@ pub fn nearest_len_up(input: String) -> i64 {
     TEN.pow(len)
 }
 
-pub fn nearest_len_down(input: &String) -> i64 {
+pub fn nearest_len_down(input: &str) -> i64 {
     const TEN: i64 = 10;
     let len: u32 = input.len().try_into().unwrap();
     TEN.pow(len - 1) - 1
@@ -235,8 +231,8 @@ mod tests {
     
     #[test]
     fn test_dn() {
-        let should_equal_ninety_nine = nearest_len_down(&"100".to_string());
-        let should_equal_four_nines = nearest_len_down(&"35925".to_string());
+        let should_equal_ninety_nine = nearest_len_down(&100.to_string());
+        let should_equal_four_nines = nearest_len_down(&35925.to_string());
 
         assert_eq!(should_equal_ninety_nine, 99);
         assert_eq!(should_equal_four_nines, 9999);

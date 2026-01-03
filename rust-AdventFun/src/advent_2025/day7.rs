@@ -1,4 +1,4 @@
-use std::{collections::{HashMap, HashSet, VecDeque}, usize};
+use std::{collections::{HashMap, HashSet, VecDeque}};
 
 use crate::advent_io::advent_file::read2025;
 
@@ -27,7 +27,7 @@ impl Teleporter {
                     Space::Splitter => print!("^")
                 }
             }
-            println!("");
+            println!();
         }
     }
 
@@ -36,14 +36,11 @@ impl Teleporter {
 
         for y in 0..self.grid.len() {
             for x in 0..self.grid[0].len() {
-                match self.grid[y][x] {
-                    Space::Splitter => {
-                        let up = y - 1;
-                        if self.grid[up][x] == Space::Beam {
-                            count += 1;
-                        }
-                    },
-                    _ => ()
+                if self.grid[y][x] == Space::Splitter {
+                    let up = y - 1;
+                    if self.grid[up][x] == Space::Beam {
+                        count += 1;
+                    }
                 }
             }
         }
@@ -56,6 +53,7 @@ impl Teleporter {
     // Challenge I need to know how much to assign to the splitter above the fcurrent one. 
     // Another thing we can do is start from bottom to top and then just count the number of
     // realities
+    #[allow(clippy::unnecessary_unwrap)]
     fn count_num_timelines(&self) -> u64 {
         let mut realities_cache: HashMap<Loc, u64> = HashMap::new();
         let mut deque: VecDeque<Loc> = VecDeque::new();
@@ -72,8 +70,8 @@ impl Teleporter {
             let left = self.find_next_splitter(&Loc::new(current.x - 1, current.y + 1));
             let right = self.find_next_splitter(&Loc::new(current.x + 1, current.y + 1));
 
-            let left_cache_value = left.as_ref().map(|loc| realities_cache.get(&loc)).flatten();
-            let right_cache_value = right.as_ref().map(|loc| realities_cache.get(&loc)).flatten();
+            let left_cache_value = left.as_ref().and_then(|loc| realities_cache.get(loc));
+            let right_cache_value = right.as_ref().and_then(|loc| realities_cache.get(loc));
 
             let left_has_been_searched = left.is_none() || left_cache_value.is_some();
             let right_has_been_searched = right.is_none() || right_cache_value.is_some();
@@ -120,7 +118,7 @@ struct Loc {
 
 impl Loc {
     fn new(x: usize, y: usize) -> Loc {
-        Loc { x: x, y: y }
+        Loc { x, y }
     }
 }
 
@@ -128,10 +126,10 @@ pub fn run_with_data() {
     let input = read2025("day7_input");
     let teleporter = run_day7(input);
     let num_active_splitters = teleporter.coun_num_splits();
-    println!("The number of active Splitters: {}", num_active_splitters);
+    println!("The number of active Splitters: {num_active_splitters}");
 
     let total_timelines = teleporter.count_num_timelines();
-    println!("The total number of timelines: {}", total_timelines);
+    println!("The total number of timelines: {total_timelines}");
 }
 
 
@@ -140,9 +138,9 @@ pub fn run_with_test_data() {
     let input = read2025("test_day7_input");
     let teleporter = run_day7(input);
     let num_active_splitters = teleporter.coun_num_splits();
-    println!("The number of active Splitters: {}", num_active_splitters);
+    println!("The number of active Splitters: {num_active_splitters}");
     let total_timelines = teleporter.count_num_timelines();
-    println!("The total number of timelines: {}", total_timelines);
+    println!("The total number of timelines: {total_timelines}");
 }
 
 /// There are two ways to do this. The first is by doing a graph traversal. We can start by going
@@ -187,8 +185,8 @@ fn run_day7(input: Vec<String> ) -> Teleporter {
     }
 
     Teleporter {
-        start: start,
-        grid: grid,
+        start,
+        grid,
         active_splitters: splitters
     }
 }
@@ -200,7 +198,7 @@ fn parse_input(input: Vec<String>) -> Vec<Vec<Space>> {
             '|' | 'S'   => Space::Beam,
             '.'         => Space::Empty,
             '^'         => Space::Splitter,
-            value       => panic!("ERROR faound invalid character: {}", value)
+            value       => panic!("ERROR faound invalid character: {value}")
         }).collect()).collect()
 }
 

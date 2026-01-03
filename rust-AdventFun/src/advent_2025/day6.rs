@@ -51,8 +51,8 @@ pub fn run_with_input(input: Vec<String>) {
     let totals_one = homework.calculate_all_totals();
     let totals_two = homework_two.calculate_all_totals();
 
-    println!("TOTALS for part1: {}", totals_one);
-    println!("Totals for part2: {}", totals_two);
+    println!("TOTALS for part1: {totals_one}");
+    println!("Totals for part2: {totals_two}");
 }
 
 // TODO: 
@@ -61,7 +61,7 @@ pub fn run_with_input(input: Vec<String>) {
 // 2. Rotate the inputs so that the vertical entries become the lines. 
 // 3. Do some assertion that each of the lines in the input are the same length. This is more of a
 //    guard on validating that all the lines are the exact same size.
-fn parse_input(input: &Vec<String>) -> Homework {
+fn parse_input(input: &[String]) -> Homework {
     let split: Vec<Vec<String>> = input.iter().map(|l| {
         l.split_whitespace().map(|f| f.to_string()).collect()
     }).collect();
@@ -74,16 +74,17 @@ fn parse_input(input: &Vec<String>) -> Homework {
 
 
     for i in 0..split.len() - 1 {
-        for j in 0..split[0].len() {
-            numbers[j].push(
-                split[i][j].parse::<u64>()
-                .expect(&format!("Error Parsing: {}", split[i][j]))
+        for (jidx, _) in split.iter().enumerate() {
+        // for j in 0..split[0].len() {
+            numbers[jidx].push(
+                split[i][jidx].parse::<u64>()
+                .unwrap_or_else(|_| panic!("Error Parsing: {}", split[i][jidx]))
             );
  
-            let operator: Operator = match split[last_idx][j].as_str() {
+            let operator: Operator = match split[last_idx][jidx].as_str() {
                 "*" => Operator::Multiply,
                 "+" => Operator::Add,
-                _ => panic!("ERROR PARSING: {}", split[last_idx][j])
+                _ => panic!("ERROR PARSING: {}", split[last_idx][jidx])
             };
 
             operators.push(operator);
@@ -93,8 +94,8 @@ fn parse_input(input: &Vec<String>) -> Homework {
     // I could just do all the math while parsing it, but doing this in a functional way for
     // testing purposes. 
     Homework {
-        numbers: numbers,
-        operators: operators
+        numbers,
+        operators
     }
 
 
@@ -106,7 +107,7 @@ fn parse_input(input: &Vec<String>) -> Homework {
 /// the column is always the number of spaces between each operand. So I can reada in the
 /// operand then calculate the width of it. THE Exception is the final column it's equal to the
 /// following spaces + 1. 
-fn parse_input_two(input: &Vec<String>) -> Homework {
+fn parse_input_two(input: &[String]) -> Homework {
     let flattened: Vec<Vec<char>> = input.iter().map(|line| line.chars().collect()).collect();
     let last_idx = flattened.len() - 1;
     let mut columns: Vec<String> = Vec::new();
@@ -116,8 +117,9 @@ fn parse_input_two(input: &Vec<String>) -> Homework {
     for i in (0..flattened[0].len()).rev() {
         let mut curr: String = String::new();
 
-        for j in 0..flattened.len() - 1 { // flattened[0].len() {
-            curr.push(flattened[j][i]);
+        for (jidx, _) in flattened.iter().take(flattened.len() - 1).enumerate() {
+        // for j in 0..flattened.len() - 1 { // flattened[0].len() {
+            curr.push(flattened[jidx][i]);
         }
 
         columns.push(curr);
@@ -142,8 +144,8 @@ fn parse_input_two(input: &Vec<String>) -> Homework {
     }
     
     Homework {
-        numbers: numbers,
-        operators: operators
+        numbers,
+        operators
     }
 }
 

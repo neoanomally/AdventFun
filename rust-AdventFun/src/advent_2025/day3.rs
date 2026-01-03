@@ -1,5 +1,3 @@
-use std::usize;
-
 use crate::advent_io;
 
 pub struct Line {
@@ -7,9 +5,9 @@ pub struct Line {
 }
 
 impl Line {
-    pub fn new(input: &String) -> Self {
+    pub fn new(input: &str) -> Self {
         let digits: Vec<u32> = input.chars()
-            .map(|c| c.to_digit(10).unwrap() as u32)
+            .map(|c| c.to_digit(10).unwrap() )
             .collect();
 
         Line { 
@@ -38,7 +36,7 @@ impl Line {
             max_seen = std::cmp::max(max_seen, self.value[i]);
         }
 
-
+        #[allow(clippy::needless_range_loop)]
         for i in 0..(len - 1) {
             if self.value[i] > max_left {
                 max_left = self.value[i];
@@ -85,7 +83,7 @@ impl Line {
             trip_wire += 1;
             // This shoul dbe 0... representing the number. 
             for idx in (0..map.len()).rev() {
-                let success: bool = match map[idx as usize].iter().position(|&v| v as i32 > last_index_removed && v <= max_index) {
+                let success: bool = match map[idx].iter().position(|&v| v as i32 > last_index_removed && v <= max_index) {
                     Some(pos) => {
                         results.push(idx as u32); // the IDX is 
                         last_index_removed  = map[idx].remove(pos) as i32;
@@ -145,9 +143,9 @@ pub fn run_with_test_data() {
 
     let total = lines.iter().fold(0_i64, |acc, line| acc + line.calculate_score_part_one() as i64);
     let results_part_two = lines.iter().fold(0, |acc, line| acc + line.calculate_score_part_two());
-    println!("Total with test data: {} ", total);
+    println!("Total with test data: {total} ");
 
-    println!("Part Two Results: {}", results_part_two);
+    println!("Part Two Results: {results_part_two}");
 }
 
 pub fn run_with_data() {
@@ -164,8 +162,8 @@ pub fn run_with_data() {
     });
 
     let total = lines.iter().fold(0_i64, |acc, line| acc + line.calculate_score_part_one() as i64);
-    println!("Total with full data: {} ", total);
-    println!("Processed {} lines. The results for part two: {}", counter, results_part_two);
+    println!("Total with full data: {total} ");
+    println!("Processed {counter} lines. The results for part two: {results_part_two}");
 }
 
 

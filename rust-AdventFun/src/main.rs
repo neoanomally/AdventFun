@@ -3,6 +3,7 @@ use std::env;
 mod advent_io;
 mod advent_2025;
 
+#[allow(clippy::uninlined_format_args)]
 fn main() { 
     let args: Vec<String> = env::args().collect();
     let mut args_iter = args.iter();
@@ -30,9 +31,11 @@ fn main() {
         "7" => advent_2025::day7::run_with_data(),
         "8" => advent_2025::day8::run_with_data(),
         "9" => advent_2025::day9::run_with_data(),
+        "10"=> advent_2025::day10::run_with_data(),
+        "11" => advent_2025::day11::run_with_data(),
         rest => {
             println!("Invalid or unimplemented --day: {}", rest);
-            advent_2025::day9::run_with_data();
+            advent_2025::day11::run_with_data();
         }
     }
     

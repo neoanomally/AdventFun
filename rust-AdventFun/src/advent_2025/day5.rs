@@ -103,12 +103,12 @@ pub fn run_with_input(input: Vec<String>) {
     // println!("Parsed Inputs: {:?}", ingredients.products)
     let num_fresh_ingredients = ingredients.count_num_fresh();
     let num_total_fresh_ids = ingredients.distinct_fresh_ingredient_ranges_available();
-    println!("The number of fresh ingredients part 1: {}", num_fresh_ingredients);
-    println!("Part two: Total number of fresh ids: {}", num_total_fresh_ids);
+    println!("The number of fresh ingredients part 1: {num_fresh_ingredients}");
+    println!("Part two: Total number of fresh ids: {num_total_fresh_ids}");
 }
 
 fn merge_ranges(ranges: Vec<Range>) -> Vec<Range> {
-    if ranges.len() < 1 {
+    if ranges.is_empty() {
         return ranges
     }
 
@@ -158,8 +158,8 @@ fn parsed_input(input: Vec<String>) -> Ingredients {
     let ranges = merge_ranges(ranges);
 
     Ingredients {
-        ranges: ranges,
-        products: products
+        ranges,
+        products
     }
 }
 
@@ -170,20 +170,20 @@ mod test {
 
     #[test]
     fn check_if_ranges_contains() {
-        let test_input: Vec<String> = vec!["10-12", "15-21", "3-5", "", "11", "81"].iter().map(|f| f.to_string()).collect();
+        let test_input: Vec<String> = ["10-12", "15-21", "3-5", "", "11", "81"].iter().map(|f| f.to_string()).collect();
         let ingredients = parsed_input(test_input);
 
         let should_contain = ingredients.contains(11);
-        let should_not_contains = ingredients.contains(0);
-        let should_also_not_contains = ingredients.contains(14);
+        let should_not_contains = !ingredients.contains(0);
+        let should_also_not_contains = !ingredients.contains(14);
         let should_aslo_contain = ingredients.contains(5);
         let should_very_much_contain = ingredients.contains(10);
 
-        assert_eq!(should_contain, true);
-        assert_eq!(should_not_contains, false);
-        assert_eq!(should_also_not_contains, false);
-        assert_eq!(should_aslo_contain, true);
-        assert_eq!(should_very_much_contain, true);
+        assert!(should_contain);
+        assert!(should_not_contains);
+        assert!(should_also_not_contains);
+        assert!(should_aslo_contain);
+        assert!(should_very_much_contain);
     }
 
     #[test]
