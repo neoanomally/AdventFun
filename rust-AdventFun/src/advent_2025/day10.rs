@@ -77,6 +77,7 @@ impl Clicks {
         Clicks { joltage_count: remaining_joltage , total_clicks: 0 }
     }
 
+    #[allow(dead_code)]
     fn increment_pattern(&self, pattern: &[bool], num_clicks: &u32) -> Option<Clicks> {
         let mut updated_joltage  = self.joltage_count.clone();
 
@@ -299,6 +300,7 @@ impl Schematic {
         pattern_values
     }
 
+    #[allow(dead_code)]
     fn generate_pattern_combinations(&self) -> Vec<Vec<bool>> {
         let num_joltages = self.joltage.len();
         let mut queue: VecDeque<Vec<bool>> = VecDeque::new();
@@ -326,10 +328,12 @@ impl Schematic {
         queue.into()
     }
 
+    #[allow(dead_code)]
     fn get_pattern(input: Vec<u32>) -> Vec<bool> {
         input.iter().map(|v| v % 2 != 0).collect()
     }
 
+    #[allow(dead_code)]
     fn second_order_patterns(patterns: HashMap<Vec<bool>, u32>) -> HashMap<Vec<u32>, u32> {
         let mut updated: HashMap<Vec<u32>, u32> = patterns.iter().fold(HashMap::new(), |mut acc, (pattern, v)| {
             let u_pattern = pattern.iter().map(|b| if *b { 1 } else { 0 } ).collect();
