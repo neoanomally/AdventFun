@@ -103,8 +103,6 @@ fn find_num_paths_points(map: &HashMap<String, Vec<String>>, start: &str, end: &
         for neighbor in neighbors {
             if !walk_state.seen.contains_key(neighbor) {
                 queue.push_front(WalkState::add_step(neighbor, &walk_state.seen));
-            } else {
-                println!("Neighbor: {neighbor} has already been seen for: {}", walk_state.current_step);
             }
         }
     }
@@ -181,10 +179,6 @@ fn find_num_paths_part_2(map: &HashMap<String, Vec<String>>, start: &str, end: &
             } 
         }
 
-    }
-
-    for path in paths_out.iter() {
-        println!("PATH: {path:?}");
     }
 
     let max_key  = paths_out.iter().max_by_key(|f| f.1.both_count);
