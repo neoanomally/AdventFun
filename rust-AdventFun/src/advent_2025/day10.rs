@@ -5,9 +5,7 @@ use crate::advent_io::advent_file::read2025;
 #[allow(dead_code)]
 pub fn run_with_test_data() {
     let input = read2025("test_day10_input");
-    run_day10(input);
-}
-
+    run_day10(input); }
 pub fn run_with_data() {
     let input = read2025("day10_input");
     run_day10(input);
@@ -20,10 +18,13 @@ fn run_day10(input: Vec<String>) {
     let sum_schematic_min_pushes = schematics.iter()
         .fold(0, |acc, schematic| acc + schematic.shortest_indicator_presses());
 
+    let mut current = 0;
     let sum_schematic_joltage_pushes = schematics.iter()
         .map(|s| {
+            current += 1;
+            
             let presses = s.shortest_joltage_presses();
-            println!("Number of presses for schematic {presses}");
+            println!("Searching: {current} Number of presses for schematic {presses}");
             presses
         })
         .fold(0_u64, |acc, e| acc + e as u64);
@@ -65,12 +66,41 @@ struct InProcess {
     num_clicks: u32
 }
 
+#[derive(Clone, Debug)]
+struct PatternProcess {
+    pattern: Vec<u32>,
+    num_clicks: u32
+}
+
+impl PatternProcess {
+    fn pattern_as_bool(&self) -> Vec<bool> {
+        self.pattern.iter()
+            .map(|data| data % 2 != 0)
+            .collect()
+    }
+
+    fn add_btn_click(&self, joltage_increments: &[usize]) -> PatternProcess {
+        let pattern = self.pattern.clone().iter()
+            .enumerate()
+            .map(|(idx, value)| if joltage_increments.contains(&idx) { *value + 1 } else { *value })
+            .collect();
+
+        PatternProcess { pattern, num_clicks: self.num_clicks + 1 }
+    }
+
+    fn add_btn_not_click(&self) -> PatternProcess { 
+        PatternProcess { pattern: self.pattern.clone(), num_clicks: self.num_clicks } 
+    }
+
+}
+
 
 #[derive(Eq, PartialEq, Debug, Clone)]
 struct Clicks {
     total_clicks: u32,
     joltage_count: Vec<u32>
 }
+
 
 impl Clicks {
     fn new(remaining_joltage: Vec<u32>) -> Clicks {
@@ -178,6 +208,7 @@ impl Schematic {
     }
 
     // should probably
+    #[allow(dead_code)]
     fn presses_for_indicator(&self, indicator: &Vec<bool>) -> Option<Clicks> {
         println!("SEARCHING FOR {indicator:?}");
         let mut queue: VecDeque<Clicks> = VecDeque::new();
@@ -269,6 +300,9 @@ impl Schematic {
         bits
     }
 
+    // let's say I have buttons 0, 1, 2, 3, 4, 5
+    // 0, 1, 3, 
+    #[allow(dead_code)]
     fn shortest_clicks_per_pattern(&self) -> HashMap<Vec<bool>, u32> {
         // We may have some pattenrs that can't be completed by clicking each button once
         // BOTH of these would be better by usingn BITs
@@ -298,6 +332,38 @@ impl Schematic {
         });
 
         pattern_values
+    }
+
+    fn generate_one_click_patterns(&self) -> HashMap<Vec<bool>, Vec<PatternProcess>> {
+        let mut queue: VecDeque<PatternProcess> = VecDeque::new();
+        let pattern = self.joltage.clone().iter().map(|_| 0).collect();
+
+        queue.push_front(PatternProcess { pattern, num_clicks: 0});
+
+        for button in self.buttons.iter() {
+            let curr_len = queue.len();
+            for _ in 0..curr_len {
+                let current_process = queue.pop_front().unwrap();
+                
+                queue.push_back(current_process.add_btn_click(button));
+                queue.push_back(current_process.add_btn_not_click());
+            }
+        }
+
+        let mut results: HashMap<Vec<bool>, Vec<PatternProcess>> = queue
+            .iter()
+            .fold(HashMap::new(), |mut acc, pattern| {
+                acc.entry(pattern.pattern_as_bool())
+                    .and_modify(|existing| existing.push(pattern.clone()))
+                    .or_insert(vec![pattern.clone()]);
+                acc
+        });
+
+        for (_, values) in results.iter_mut() {
+            values.sort_by_key(|value| value.num_clicks);
+        }
+
+        results
     }
 
     #[allow(dead_code)]
@@ -368,50 +434,69 @@ impl Schematic {
     // 
     // TODO: We can use a priority queue that takes the min number of clicks 
     fn shortest_joltage_presses(&self, ) -> u32 {
-        let patterns: HashMap<Vec<bool>, Clicks> = self.shortest_clicks_per_pattern()
-            .iter()
-            .fold(HashMap::new(), |mut acc, (key, value)| {
-                let updated_vec = key.iter().map(|f| if *f { 1 } else { 0 }).collect();
-                acc.insert(key.clone(), Clicks { joltage_count: updated_vec, total_clicks: *value });
-                acc
-            });
+        let patterns: HashMap<Vec<bool>, Vec<PatternProcess>> = self.generate_one_click_patterns();
 
-        println!("Buttons: {:?}\nPatterns:", self.buttons);
+        // println!("PATTERNS: ");
+        // for pattern in patterns.iter() {
+        //     println!("Pattern: {:?}", pattern.1);
+        // }
 
-        for pattern in patterns.iter() { 
-            println!("  |-> {pattern:?}");
-        }
-
-        self.recurse(patterns, self.joltage.clone())
+        Self::recurse(&patterns, self.joltage.clone(), &mut HashMap::new(),&mut 0).expect("Error no patterns found")
     }
 
-    fn recurse(&self, mut patterns: HashMap<Vec<bool>, Clicks>, mut joltages: Vec<u32>) -> u32 {
-        if joltages.iter().sum::<u32>() == 0 {
-            1
-        } else {
-            let odds: Vec<bool> = joltages.iter().map(|f| f % 2 != 0).collect();
+    // Rewrite to do our own Stack management
+    fn recurse(patterns: &HashMap<Vec<bool>, Vec<PatternProcess>>, joltages: Vec<u32>, cache: &mut HashMap<Vec<u32>, Option<u32>>, count: &mut u32) -> Option<u32> {
+        *count += 1;
+        if *count > 1000 { return None } 
+        // println!("JOLTAGES: {joltages:?}");
+        if let Some(val) = cache.get(&joltages) {
+            // println!("CACHE CONTAINS {val:?}");
+            return *val
+        } 
 
-            let pattern = match patterns.get(&odds) {
-                Some(v) => v.clone(),
-                None => {
-                    let new_pattern = self.presses_for_indicator(&odds)
-                        .unwrap_or_else(|| panic!("ERROR PATTERN: {odds:?} does not exist"));
+        if joltages.iter().all(|f| *f == 0) {
+            return Some(0)
+        }
 
-                    patterns.insert(new_pattern.get_indicator_lights(), new_pattern.clone());
-                    new_pattern
+        let curr_pattern = joltages.iter().map(|f| f % 2 != 0).collect::<Vec<bool>>();
+        
+        let mut res: Vec<u32> = Vec::new();
+
+        for pattern_process in patterns.get(&curr_pattern).unwrap_or(&Vec::new()) {
+            let mut updated_joltage: Vec<u32> = Vec::new();
+            let mut cost_error = false;
+
+            for (idx, val) in pattern_process.pattern.iter().enumerate() {
+                if *val > joltages[idx] {
+                    cost_error = true;
+                    break;
                 }
-            };
 
-            for (idx, joltage) in joltages.iter_mut().enumerate() {
-                *joltage -= pattern.joltage_count[idx];
-                *joltage /=2;
+                updated_joltage.push(joltages[idx] - *val);
             }
 
+            if cost_error || updated_joltage.iter().all(|f| f % 2 != 0) { continue; } 
+            if updated_joltage.iter().all(|f| *f == 0) {
+                cache.insert(joltages, Some(pattern_process.num_clicks));
+                return Some(pattern_process.num_clicks);
+            }
+            let updated_joltage = updated_joltage.iter().map(|f| f / 2).collect();
 
-            self.recurse(patterns, joltages) + pattern.total_clicks
+            let curr = Self::recurse(patterns, updated_joltage, cache, count)
+                .map(|f| (2 * f) + pattern_process.num_clicks);
+
+            if let Some(v) = curr { 
+                res.push(v);
+            }
         }
+
+        let min = res.iter().min().copied();
+        cache.insert(joltages.clone(), min);
+
+        min
     }
 }
+
 
 fn remove_front_and_back(input: String) -> String {
     if input.len() < 3 {
@@ -504,7 +589,26 @@ pub mod day10_tests {
         let first = schematics.first().unwrap();
         let patterns = first.generate_pattern_combinations();
 
-        println!("Patterns: {patterns:?}");
+        assert_eq!(patterns.len(), 15);
+    }
+
+    #[test]
+    fn test_generate_one_click_patterns() {
+        let test_input = read2025("test_day10_input");
+        let schematics = parse_input(test_input);
+        let first = schematics.first().unwrap();
+
+        let one_click_patterns = first.generate_one_click_patterns();
+
+        // TODO: USE THESE PATTERNS for the main thing
+        assert_eq!(one_click_patterns.len(), 16);
+        // for (pattern, patterns) in one_click_patterns {
+        //     let num_len = patterns.len();
+        //     pattern.iter().for_each(|v| if *v { print!("#") } else { print!("."); });
+        //     let patterns_as_veec: Vec<Vec<u32>> = patterns.into_iter().map(|f| f.pattern).collect();
+        //     print!("\t");
+        //     println!("{patterns_as_veec:?} --> {num_len}");
+        // }
     }
 }
 

@@ -1,6 +1,6 @@
 # Advent of Code - Mike Sanders
 
-2021 - 2024
+2021 - 2025
 
 Every year I mean to do Advent of code, but by the time I remember it's the end of the year. 
 
@@ -16,15 +16,27 @@ about as I go through Advent of Code 2021:I am using this as a
 1. Practice Scala 3
 2. Domain Design
 3. Functional Programming and Immutability
+4. Learn a new language like rust.
+
+# Notes to self
+
+TODO: UPDATE My readme
+TODO: Maybe make this more generic instead of a main per... But the mains where I've been storing the problem statements. 
+TODO: Add in 2022-2024 into the README
 
 ## Running tests:
 ```bash
 sbt test
 ```
+## Rust 
+Year 2025; decided to do the problems in Rust. The primary goal is to learn the syntax, gotchyas and error cases. 
+The rust project can be run in the [rust-AdventFun](./rust-AdventFun) repository
 
-TODO: UPDATE My readme
-TODO: Maybe make this more generic instead of a main per... But the mains where I've been storing the problem statements. 
-TODO: Add in 2022 into the README
+```bash
+cargo test day12 -- show-output
+cargo run day 10
+```
+
 ## Running the various Days in 2021:
 1. Day One:       `sbt "runMain com.sandersme.advent.SonarSweep"`
 2. Day Two:       `sbt "runMain com.sandersme.advent.Dive"`
